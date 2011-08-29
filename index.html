@@ -9,13 +9,65 @@
 <script type="text/javascript">
 var citiesXml = null;
 
- function loadCitiesXml() {
-		var req = new XMLHttpRequest();
-		req.open("GET", "cities.xml", false); 
-		req.send(null);
-		citiesXml = req.responseXML;		
- }
+var measures = {
+	second: 1,
+	minute: 60,
+	hour: 3600,
+	day: 86400,
+	week: 604800,
+	month: 2592000,
+	year: 31536000
+};
  
+
+function loadCitiesXml() {
+	var req = new XMLHttpRequest();
+	req.open("GET", "cities.xml", false); 
+	req.send(null);
+	citiesXml = req.responseXML;		
+}
+
+function chkMultiple(amount, type) {
+		return (amount > 1) ? amount + " " + type + "s":"a " + type;
+};
+
+function getHumanReadableDate(date) {
+	var dateStr, amount,
+		current = new Date().getTime(),
+		diff = (current - date.getTime()) / 1000;
+
+	if(diff > measures.year) {
+		amount = Math.round(diff/measures.year);
+		dateStr = "about " + chkMultiple(amount, "year") + " ago";
+	} 
+	else if(diff > measures.month) {
+		amount = Math.round(diff/measures.month);
+		dateStr = "about " + chkMultiple(amount, "month") + " ago";
+	} 
+	else if(diff > measures.week) {
+		amount = Math.round(diff/measures.week);
+		dateStr = "about " + chkMultiple(amount, "week") + " ago";
+	} 
+	else if(diff > measures.day) {
+		amount = Math.round(diff/measures.day);
+		dateStr = "about " + chkMultiple(amount, "day") + " ago";
+	} 
+	else if(diff > measures.hour) {
+		amount = Math.round(diff/measures.hour);
+		dateStr = "about " + chkMultiple(amount, "hour") + " ago";
+	} 
+	else if(diff > measures.minute) {
+		amount = Math.round(diff/measures.minute);
+		dateStr = "about " + chkMultiple(amount, "minute") + " ago";
+	} 
+	else {
+		dateStr = "a few seconds ago";
+	}
+
+	return dateStr;
+}
+ 
+
  function refreshCityTable() {
   	loadCitiesXml();
   	
@@ -46,7 +98,13 @@ var citiesXml = null;
 		 	cell2.innerHTML = "n/a";
 		 }
 		 else {
-		 	cell2.innerHTML = stats_last_rendering_finished;
+		 	try {
+		 		var date = new Date(Date.parse(stats_last_rendering_finished));
+		 		cell2.innerHTML = getHumanReadableDate(date);
+		 	}
+		 	catch (err) {
+		 		cell2.innerHTML = stats_last_rendering_finished;
+		 	}
 		 }
 		 var cell3 = document.createElement("td");
 		 if (state_type == "READY") {

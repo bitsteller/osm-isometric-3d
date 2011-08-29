@@ -1,0 +1,6 @@
+<cities>
+	<server url="bitsteller.bplaced.net" user="bitsteller" path="osm"/> <!--Important: Change this data to fit for your ftp account. The password will be securely stored stored in gnome-keyring-->
+	<city id="b" name="Berlin">
+		<area osm="http://download.geofabrik.de/osm/europe/germany/berlin.osm.pbf" top="52.5463" left="13.3476" bottom="52.484" right="13.4382"/>
+	</city>
+</cities>

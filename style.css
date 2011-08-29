@@ -1,0 +1,76 @@
+body {
+	height:95%;
+	background: #F5F4EF;
+	font-family: 'Trebuchet MS', Trebuchet, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+h2, h3, h4, h5, h6 {
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: .8em;
+    text-shadow: 1px 1px 2px #CCC;
+}
+
+.box{
+	background: #fff;
+	padding: 20px;
+	clear:both;
+   padding: 20px;
+   margin-top: 2em;
+   margin-bottom: 2em;
+
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+
+.box h2 {color: #4464c7; font-size: 1.714em; margin-bottom: 0.333em;}
+
+#page{
+	max-width:800px;
+	clear: both; 
+	margin: 0 auto;
+}
+
+#top{
+	width:auto;
+	padding-left:10px;
+	padding-right:10px;
+	margin-bottom: 2em;
+	font-size:large;
+}
+
+#bottom {
+	text-align:center;
+}
+
+#logo{
+	float:left;
+	padding-right:10px;
+}
+
+#info{
+	width:auto;
+	height:5%;
+	padding-left:10px;
+	padding-right:10px;
+	font-size:large;
+}
+
+#state{
+	float:right;
+}
+
+#map{
+	height:95%;
+	background: #fff;
+	overflow: hidden;
+	padding: 10px;
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+
+#city_select {
+	font-size:large;
+}

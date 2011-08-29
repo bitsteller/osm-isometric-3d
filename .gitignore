@@ -1,0 +1,12 @@
+osm2pov
+output
+osmosis
+output
+temp
+textures
+twidge
+*.pbf
+*.osm
+osm2pov-styles.inc
+*.png
+*.pov

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<title>Openstreetmap projects</title>
+<script type="text/javascript" src="khtml_all.js"> </script> 
+
+<script type="text/javascript">
+var citiesXml = null;
+
+ function loadCitiesXml() {
+		var req = new XMLHttpRequest();
+		req.open("GET", "cities.xml", false); 
+		req.send(null);
+		citiesXml = req.responseXML;		
+ }
+ 
+  function init() {
+ 	loadCitiesXml();
+ 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+ 	var select=document.getElementById("city_select");
+ 	
+ 	var city = city_iterator.iterateNext();
+	while (city) {
+		var city_id = city.textContent;		
+		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var stats_last_rendering_finished = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/stats/@last-rendering-finished" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var state_date = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@date" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var state_type = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@type" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var state_message = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@message" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var table = document.getElementById("city_list");
+		 var row = document.createElement("tr");
+		 var cell1 = document.createElement("td");
+		 var link = document.createElement("a");
+		 link.setAttribute("href", "map.html#" + city_id);
+		 link.innerHTML = city_name;
+		 cell1.appendChild(link);
+		 var cell2 = document.createElement("td");
+		 if (stats_last_rendering_finished == "") {
+		 	cell2.innerHTML = "n/a";
+		 }
+		 else {
+		 	cell2.innerHTML = stats_last_rendering_finished;
+		 }
+		 var cell3 = document.createElement("td");
+		 if (state_type == "READY") {
+		 	cell3.innerHTML = "";
+		 }
+		 else {
+		 	cell3.innerHTML = "//" + state_date + ": " + state_message;
+		 }
+		 row.appendChild(cell1);
+		 row.appendChild(cell2);
+		 row.appendChild(cell3);
+		 table.appendChild(row);
+  		city = city_iterator.iterateNext();
+	}
+  }
+
+</script>
+</head>
+<body onload="init()">
+	<div id="page">
+	<p id="top">
+	<a href="http://www.openstreetmap.org"><img src="http://www.openstreetmap.org/images/osm_logo.png?1271689861" id="logo"/></a>
+	<h1>Isometric 3D maps</h1>
+	<h3>based on OpenStreeetMap data</h3>
+	</p>
+	<div class="box">
+	<h2>Isometric 3D maps of some cities</h2>
+	<b>Update: </b> Every city is now also available on a zoomable map. The download of cities as image files will be discontinued in near future, but is still available <a href="old.html">here</a>. Feedback concerning the the map view is welcome, bugreports appreciated.<br/>
+	<p>
+		The following german cities have been rendered as isometric 3D maps based on OpenStreetMap data:
+		<p>
+		<table id="city_list">
+			<th>City</th> <th>Last update</th> <th>Note</th>
+		</table>
+		</p>
+	</p>
+	
+	<p>Follow <a href="http://www.twitter.com/bitstellerOSM">@bitstellerOSM</a> on Twitter to get notifed when a new rendering is finished. Please note that the OSM data of the renderings might be up to 5 days older than the image date.</p> 
+	</div>
+	<div class="box">
+	<h2>osm2pov</h2>
+	<p>The above renderings are based on the code at <a href="http://github.com/bitsteller/osm2pov">http://github.com/bitsteller/osm2pov</a>, which is a fork of <a href="http://github.com/guerda/osm2pov">http://github.com/guerda/osm2pov</a>. The code is released under the GPL v3. For more information see <a href="http://osm.kyblsoft.cz/3dmapa/">http://osm.kyblsoft.cz/3dmapa/</a>.
+	</p>
+	</div>
+	<div class="box">
+	<h2>osm2pov - rendering changes</h2>
+	<ul>
+		<li>2011-03-14: parse building/building:use tag to get the building type</li>
+		<li>2011-02-10: add support for buildings above floor. See <a href="http://osm.kyblsoft.cz/3dmapa/?zoom=17&amp;lat=75.71906&amp;lon=14.45092&amp;layers=B">here</a> for example (thanks to Aleš Janda)</li>
+		<li>2011-01-26: render landuse=greenfield</li>
+		<li>2011-01-19: render leisure=garden</li>
+		<li>2011-01-18: render waterway=drain</li>
+		<li>2011-01-18: render pedestrian area lower than streets (fixes streets missing in pedestrian areas)</li>
+		<li>2011-01-18: use the lanes tag to compute way width if no width tag is given</li>
+		<li>2011-01-16: render railway=preserved and railway=narrow_gauge</li>
+		<li>2011-01-08: don't render walls (and other objects) as area (thanks to Aleš Janda)</li>
+		<li>2010-12-29: render meadows (landuse=meadow)</li>
+		<li>2010-12-20: render man_made=chimney at way (thanks to Aleš Janda)</li>
+		<li>2010-12-19: nicer farmland texture (more decent)</li>
+		<li>2010-12-13: render farmland (landuse=farm, farmland or farmyard)</li>
+		<li>2010-12-13: nicer lighting; little more natural building parts in shadow (thanks to Aleš Janda)</li>
+		<li>2010-12-13: render tunnels, forests and areas even if layer &lt; 0 (thanks to Aleš Janda)</li>
+	   <li>2010-11-21: map looks more spatially (thanks to Aleš Janda)</li>
+		<li>2010-11-19: fix to building height (thanks to Aleš Janda)</li>
+		<li>2010-11-19: Ways have seamless links to bridges (thanks to Aleš Janda)</li>
+		<li>2010-11-19: More types of building roofs, autodetection of (non)living building (thanks to Aleš Janda)</li>
+		<li>2010-11-07: Don't render ways with layer &lt; 0</li>
+		<li>2010-11-06: Use width tag also on ways with border</li>
+		<li>2010-11-04: Fixes to way width</li>
+		<li>2010-11-01: Render primary_link (thanks to Aleš Janda)</li>
+		<li>2010-10-29: Render way width (thanks to andrewharvey)</li>
+		<li>2010-09-25: Render windmills</li>
+		<li>2010-07-27: Render parking areas</li>
+		<li>2010-05-04: Reunifed code: Changes of my fork are now available in the official osm2pov</li>
+		<li>2010-04-17: Add rendering of tramways (railway=tram)</li>
+		<li>2010-04-16: Improved rendering of railways (now with textures)</li>
+		<li>2010-04-15: Render beach (natural=beach)</li>
+		<li>2010-04-15: Vastly improved rendering of railways</li>
+		<li>2010-04-15: Render litterboxes (amenity=post_box) for testing</li>
+		<li>2010-04-15: Change scale of single trees (natural=tree) to 0.2</li>
+		<li>2010-04-14: Add rendering of stadiums (leisure=stadium)</li>
+		<li>2010-04-14: Add rendering of single trees (natural=tree)</li>
+		<li>2010-04-09: Add rendering of obelisks (preliminary)</li>
+		<li>2010-04-08: Add rendering of residential areas</li>
+		<li>2010-04-07: initial version 0.1.2 from <a href="http://osm.kyblsoft.cz/3dmapa/">http://osm.kyblsoft.cz/3dmapa/</a></li>
+	</ul>
+	
+	</div>
+	
+	<div id="bottom">
+		<h2>Contact</h2>
+		Nils Breyer <br/>
+		<a href="http://www.twitter.com/bitsteller">@bitsteller</a> / <a href="http://www.twitter.com/bitstellerOSM">@bitstellerOSM</a> <br/>
+		<a href="http://wiki.openstreetmap.org/wiki/User:Bitsteller">User page on the OSM Wiki</a> <br/>
+		Mail: nbnet at arcor.de
+	</div>
+	</div>
+</body>
+</html>

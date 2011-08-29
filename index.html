@@ -16,12 +16,18 @@ var citiesXml = null;
 		citiesXml = req.responseXML;		
  }
  
-  function init() {
- 	loadCitiesXml();
- 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
- 	var select=document.getElementById("city_select");
+ function refreshCityTable() {
+  	loadCitiesXml();
+  	
+  	//clear table
+ 	var table = document.getElementById("city_list").getElementsByTagName("tbody")[0];
+	while (table.firstElementChild) {
+ 		table.removeChild(table.firstElementChild);
+	}
  	
+ 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
  	var city = city_iterator.iterateNext();
+ 	var working = false;
 	while (city) {
 		var city_id = city.textContent;		
 		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
@@ -29,7 +35,6 @@ var citiesXml = null;
 		var state_date = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@date" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 		var state_type = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@type" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 		var state_message = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@message" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		var table = document.getElementById("city_list");
 		 var row = document.createElement("tr");
 		 var cell1 = document.createElement("td");
 		 var link = document.createElement("a");
@@ -48,6 +53,9 @@ var citiesXml = null;
 		 	cell3.innerHTML = "";
 		 }
 		 else {
+		 	if (state_type =="WORKING") {
+		 		working=true;
+		 	}
 		 	cell3.innerHTML = "//" + state_date + ": " + state_message;
 		 }
 		 row.appendChild(cell1);
@@ -56,6 +64,17 @@ var citiesXml = null;
 		 table.appendChild(row);
   		city = city_iterator.iterateNext();
 	}
+	if (working == true) {
+		setTimeout("refreshCityTable()",5000); //reload every 5 secs
+	}
+	else {
+		setTimeout("refreshCityTable()",60000); //reload every minute
+	}
+
+ }
+ 
+  function init() {
+		refreshCityTable();
   }
 
 </script>
@@ -74,7 +93,12 @@ var citiesXml = null;
 		The following german cities have been rendered as isometric 3D maps based on OpenStreetMap data:
 		<p>
 		<table id="city_list">
-			<th>City</th> <th>Last update</th> <th>Note</th>
+			<thead>
+				<tr><th>City</th> <th>Last update</th> <th>Note</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Loading...</td><td>(Javascript has to be enabled)</td><td></td></tr>
+			</tbody>
 		</table>
 		</p>
 	</p>

@@ -130,7 +130,7 @@ def update_city_state(id, state_type, message):
 	state = city.xpath("state")[0]
 	
 	#Update state data
-	state_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+	state_date = str(int(time.time()*1000))
 	state.set("date", state_date)
 	state.set("type",state_type)
 	state.set("message",message)
@@ -342,7 +342,7 @@ def download_city(id):
 def update_city(id):
 	global date_start, date_end
 	
-	date_start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+	date_start = int(time.time()*1000)
 	update_city_state(id, "WORKING", "Preparing rendering...")
 	download_city(id)
 	update_city_state(id, "WORKING", "Rendering city...")
@@ -352,7 +352,7 @@ def update_city(id):
 	update_city_state(id, "WORKING", "Uploading...")
 	upload_tiles(id)
 	update_city_state(id, "WORKING", "Updating statistics...")
-	date_end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+	date_end = int(time.time()*1000)
 	update_city_stats(id)
 	update_city_state(id, "WORKING", "Tweeting state...")
 	root = cities.getroot()

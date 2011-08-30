@@ -99,7 +99,7 @@ function getHumanReadableDate(date) {
 		 }
 		 else {
 		 	try {
-		 		var date = new Date(Date.parse(stats_last_rendering_finished));
+		 		var date = new Date(parseInt(stats_last_rendering_finished));
 		 		cell2.innerHTML = getHumanReadableDate(date);
 		 	}
 		 	catch (err) {
@@ -114,7 +114,17 @@ function getHumanReadableDate(date) {
 		 	if (state_type =="WORKING") {
 		 		working=true;
 		 	}
-		 	cell3.innerHTML = "//" + state_date + ": " + state_message;
+		 	
+		 	cell3.innerHTML = "//";
+		 	try {
+		 		var date_state = new Date(parseInt(state_date));
+		 		cell3.innerHTML += getHumanReadableDate(date_state);
+		 	}
+		 	catch (err) {
+		 		cell3.innerHTML += state_date;
+		 	}
+
+		 	cell3.innerHTML += ": " + state_message;
 		 }
 		 row.appendChild(cell1);
 		 row.appendChild(cell2);

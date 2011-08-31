@@ -1,119 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<link rel="stylesheet" type="text/css" href="style.css" />
-
-<title>3D map</title>
-<script type="text/javascript" src="khtml_all.js"> </script> 
-
-<script type="text/javascript">
-var map=null;
-var citiesXml = null;
-
-function long2tile(lon,zoom) { return ((lon+180)/360*Math.pow(2,zoom)); }
-function lat2tile(lat,zoom)  { return ((1-Math.log(Math.tan(lat*Math.PI/180) + 1/Math.cos(lat*Math.PI/180))/Math.PI)/2 *Math.pow(2,zoom)); }
-
- function tile2long(x,z) {
-  return (x/Math.pow(2,z)*360-180);
- }
- function tile2lat(y,z) {
-  var n=Math.PI-2*Math.PI*y/Math.pow(2,z);
-  return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
- }
- 
- function loadCitiesXml() {
-		var req = new XMLHttpRequest();
-		req.open("GET", "cities.xml", false); 
-		req.send(null);
-		citiesXml = req.responseXML;		
- }
- 
- function loadCity() {
-	//set map center and zoom
-    if (location.href.indexOf("#") != -1) {
-		loadCitiesXml();
-		var city_id = location.href.substr(location.href.indexOf("#")+1);
-		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		if (city_name == "") {
-			document.getElementById("state").data = "Last update: unkown";
-			alert("404 - City not found");
-			return;
-		}
-		//get values from cities.xml
-		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var stats_last_rendering_finished = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/stats/@last-rendering-finished" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		
-		//update page title
-		document.title = "3D map of " + city_name;
-		//update state info
-		var div=document.getElementById("state");
-		if (stats_last_rendering_finished == "") {
-			var newNode=document.createTextNode("Last update: " + "n/a");
-		}
-		else {
-			var newNode=document.createTextNode("Last update: " + stats_last_rendering_finished);
-		}
-		div.replaceChild(newNode,div.childNodes[0]);
-		
-		map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12),(area_left+area_right)/2.0),13);
-		
-		 var select=document.getElementById("city_select");
-		 for (var i = 0; i < select.length; i++) {
-		 	if (select.options[i].value == city_id) {
-		 		select.options[i].selected = true;
-		 	}
-		 	else {
-		 		select.options[i].selected = false;
-		 	}
-		 }
-    }
- }
- 
-  function selectedCity() {
-  	  var select=document.getElementById("city_select");
-	  var wert = select.options[select.options.selectedIndex].value;
-	  location.href = "map.html#" + wert;
-  }
- 
-  function init(){
-	//initialize map
-	map=new khtml.maplib.Map(document.getElementById("map"));
-	
-	map.tiles({
-	  maxzoom:15,
-	  minzoom:12,
-	  src:function(x,y,z){
-		  return "tiles/"+z+"/"+x+"/"+y+".png";
-	  },
-	  copyright:"osm"
-	})
- 	
- 	loadCitiesXml();
- 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
- 	var select=document.getElementById("city_select");
- 	
- 	var city = city_iterator.iterateNext();
-	while (city) {
-		var city_id = city.textContent;		
-		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		newOption = new Option(city_name, city_id);
-  		select.options[select.length] = newOption;
-  		city = city_iterator.iterateNext();
-	}
-	
-	loadCity();
- 	window.onhashchange = loadCity;
-  }
-
-</script>
-</head>
-<body onload="init()">
-<div id="info">City: <select id="city_select" size="1"  onchange="selectedCity()"></select> | <a href="index.html">Back to overview</a> 
-<div id="state">Last update: unknown</div></div>
-<div id="map"> </div>
-</body>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<title>3D map</title>
+		<script type="text/javascript" src="khtml_all.js"> </script> 
+		<script type="text/javascript" src="osm-isometric-3d.js"> </script> 
+	</head>
+	<body onload="initMap()">
+		<div id="info">City: <select id="city_select" size="1"  onchange="selectedCity()"></select> | <a href="index.html">Back to overview</a> 
+		<div id="state">Last update: unknown</div></div>
+		<div id="map"> </div>
+	</body>
 </html>

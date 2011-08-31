@@ -36,7 +36,7 @@ function getHumanReadableDate(date) {
 		current = new Date().getTime(),
 		diff = (current - date.getTime()) / 1000;
 
-	if(diff > measures.month) {
+	if(diff > measures.week) {
 		dateStr = date.getFullYear() + "-";
 		if (date.getMonth()+1 < 10) 
 			dateStr += "0";
@@ -45,21 +45,17 @@ function getHumanReadableDate(date) {
 			dateStr += "0";
 		dateStr += date.getDate();
 	}
-	else if(diff > measures.week) {
-		amount = Math.round(diff/measures.week);
-		dateStr = "about " + chkMultiple(amount, "week") + " ago";
-	} 
 	else if(diff > measures.day) {
 		amount = Math.round(diff/measures.day);
-		dateStr = "about " + chkMultiple(amount, "day") + " ago";
+		dateStr = ((amount > 1) ? amount + " " + "days ago":"yesterday");
 	} 
 	else if(diff > measures.hour) {
 		amount = Math.round(diff/measures.hour);
-		dateStr = "about " + chkMultiple(amount, "hour") + " ago";
+		dateStr = ((amount > 1) ? amount + " " + "hour" + "s":"an " + "hour") + " ago";
 	} 
 	else if(diff > measures.minute) {
 		amount = Math.round(diff/measures.minute);
-		dateStr = "about " + chkMultiple(amount, "minute") + " ago";
+		dateStr = ((amount > 1) ? amount + " " + "minute" + "s":"a " + "minute") + " ago";
 	} 
 	else {
 		dateStr = "a few seconds ago";

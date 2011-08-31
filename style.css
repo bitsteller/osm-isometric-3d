@@ -76,11 +76,20 @@ table {
 }
 
 #state{
+	
+}
+
+#backlink{
 	float:right;
 }
 
+#attribution{
+	float:right;
+	font-size:small;
+}
+
 #map{
-	height:95%;
+	height:90%;
 	background: #fff;
 	overflow: hidden;
 	padding: 10px;
@@ -91,4 +100,10 @@ table {
 
 #city_select {
 	font-size:large;
+}
+
+#footer{
+	margin-top:10px;
+	padding-left:20px;
+	padding-right:20px;
 }

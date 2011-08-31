@@ -117,16 +117,14 @@ function refreshCityTable() {
 		 		working=true;
 		 	}
 		 	
-		 	cell3.innerHTML = "//";
+		 	cell3.innerHTML += state_message;
 		 	try {
 		 		var date_state = new Date(parseInt(state_date));
-		 		cell3.innerHTML += getHumanReadableDate(date_state);
+		 		cell3.innerHTML += '<br/><div class="timestamp">' + getHumanReadableDate(date_state) + "</div>";
 		 	}
 		 	catch (err) {
-		 		cell3.innerHTML += state_date;
+				
 		 	}
-
-		 	cell3.innerHTML += ": " + state_message;
 		 }
 		 row.appendChild(cell1);
 		 row.appendChild(cell2);

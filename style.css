@@ -15,6 +15,11 @@ td {
 	padding-right: 10px;
 }
 
+table {
+	margin-left:auto;
+	margin-right:auto;
+}
+
 .box{
 	background: #fff;
 	padding: 20px;
@@ -28,7 +33,16 @@ td {
 	-webkit-border-radius: 10px;
 }
 
-.box h2 {color: #4464c7; font-size: 1.714em; margin-bottom: 0.333em;}
+.box h2 {
+	color: #4464c7; 
+	font-size: 1.714em; 
+	margin-bottom: 0.333em;
+}
+
+.timestamp {
+	color: #999;
+	font-size: 11px;
+}
 
 #page{
 	max-width:800px;

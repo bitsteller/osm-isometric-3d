@@ -342,7 +342,7 @@ def download_city(id):
 def update_city(id):
 	global date_start, date_end
 	
-	date_start = int(time.time()*1000)
+	date_start = str(int(time.time()*1000))
 	update_city_state(id, "WORKING", "Preparing rendering...")
 	download_city(id)
 	update_city_state(id, "WORKING", "Rendering city...")
@@ -352,7 +352,7 @@ def update_city(id):
 	update_city_state(id, "WORKING", "Uploading...")
 	upload_tiles(id)
 	update_city_state(id, "WORKING", "Updating statistics...")
-	date_end = int(time.time()*1000)
+	date_end = str(int(time.time()*1000))
 	update_city_stats(id)
 	update_city_state(id, "WORKING", "Tweeting state...")
 	root = cities.getroot()

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<title>Openstreetmap projects</title>
+<title>Isometric 3D maps</title>
 <script type="text/javascript" src="khtml_all.js"> </script> 
 
 <script type="text/javascript">
@@ -36,14 +36,15 @@ function getHumanReadableDate(date) {
 		current = new Date().getTime(),
 		diff = (current - date.getTime()) / 1000;
 
-	if(diff > measures.year) {
-		amount = Math.round(diff/measures.year);
-		dateStr = "about " + chkMultiple(amount, "year") + " ago";
-	} 
-	else if(diff > measures.month) {
-		amount = Math.round(diff/measures.month);
-		dateStr = "about " + chkMultiple(amount, "month") + " ago";
-	} 
+	if(diff > measures.month) {
+		dateStr = date.getFullYear() + "-";
+		if (date.getMonth()+1 < 10) 
+			dateStr += "0";
+		dateStr += (date.getMonth()+1) + "-";
+		if (date.getDate() < 10)
+			dateStr += "0";
+		dateStr += date.getDate();
+	}
 	else if(diff > measures.week) {
 		amount = Math.round(diff/measures.week);
 		dateStr = "about " + chkMultiple(amount, "week") + " ago";
@@ -157,6 +158,8 @@ function getHumanReadableDate(date) {
 	<div class="box">
 	<h2>Isometric 3D maps of some cities</h2>
 	<b>Update: </b> Every city is now also available on a zoomable map. The download of cities as image files will be discontinued in near future, but is still available <a href="old.html">here</a>. Feedback concerning the the map view is welcome, bugreports appreciated.<br/>
+	
+	<b>Update (2011-08-31): </b> After changes to the rendered areas, all tiles of all cities are currently being newly generated. For a short time some cities won't be available on the map.<br/>
 	<p>
 		The following german cities have been rendered as isometric 3D maps based on OpenStreetMap data:
 		<p>

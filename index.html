@@ -4,9 +4,19 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<title>Isometric 3D maps</title>
-	<script type="text/javascript" src="khtml_all.js"> </script> 
-	<script type="text/javascript" src="osm-isometric-3d.js"></script> 
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+	<script type="text/javascript" src="js/khtml_all.js"> </script> 
+	<script type="text/javascript" src="js/osm-isometric-3d.js"></script> 
 	<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+	<script src="js/github.js"></script>
+   <script src="js/md5.js"></script>
+   <script src="js/github.commits.widget.js"></script>
+   <script>
+	$(function() {
+		$('#github-commits-osm2pov').githubInfoWidget(
+			{ user: 'bitsteller', repo: 'osm2pov', branch: 'master', last: 15, limitMessageTo: 30 });
+	});
+  </script>  
 </head>
 <body onload="initIndex()">
 	<div id="page">
@@ -48,48 +58,8 @@
 	</div>
 	<div class="box">
 	<h2>osm2pov - rendering changes</h2>
-	<ul>
-		<li>2011-08-31: render waterway=dock </li>
-		<li>2011-03-14: parse building/building:use tag to get the building type</li>
-		<li>2011-02-10: add support for buildings above floor. See <a href="http://osm.kyblsoft.cz/3dmapa/?zoom=17&amp;lat=75.71906&amp;lon=14.45092&amp;layers=B">here</a> for example (thanks to Aleš Janda)</li>
-		<li>2011-01-26: render landuse=greenfield</li>
-		<li>2011-01-19: render leisure=garden</li>
-		<li>2011-01-18: render waterway=drain</li>
-		<li>2011-01-18: render pedestrian area lower than streets (fixes streets missing in pedestrian areas)</li>
-		<li>2011-01-18: use the lanes tag to compute way width if no width tag is given</li>
-		<li>2011-01-16: render railway=preserved and railway=narrow_gauge</li>
-		<li>2011-01-08: don't render walls (and other objects) as area (thanks to Aleš Janda)</li>
-		<li>2010-12-29: render meadows (landuse=meadow)</li>
-		<li>2010-12-20: render man_made=chimney at way (thanks to Aleš Janda)</li>
-		<li>2010-12-19: nicer farmland texture (more decent)</li>
-		<li>2010-12-13: render farmland (landuse=farm, farmland or farmyard)</li>
-		<li>2010-12-13: nicer lighting; little more natural building parts in shadow (thanks to Aleš Janda)</li>
-		<li>2010-12-13: render tunnels, forests and areas even if layer &lt; 0 (thanks to Aleš Janda)</li>
-	   <li>2010-11-21: map looks more spatially (thanks to Aleš Janda)</li>
-		<li>2010-11-19: fix to building height (thanks to Aleš Janda)</li>
-		<li>2010-11-19: Ways have seamless links to bridges (thanks to Aleš Janda)</li>
-		<li>2010-11-19: More types of building roofs, autodetection of (non)living building (thanks to Aleš Janda)</li>
-		<li>2010-11-07: Don't render ways with layer &lt; 0</li>
-		<li>2010-11-06: Use width tag also on ways with border</li>
-		<li>2010-11-04: Fixes to way width</li>
-		<li>2010-11-01: Render primary_link (thanks to Aleš Janda)</li>
-		<li>2010-10-29: Render way width (thanks to andrewharvey)</li>
-		<li>2010-09-25: Render windmills</li>
-		<li>2010-07-27: Render parking areas</li>
-		<li>2010-05-04: Reunifed code: Changes of my fork are now available in the official osm2pov</li>
-		<li>2010-04-17: Add rendering of tramways (railway=tram)</li>
-		<li>2010-04-16: Improved rendering of railways (now with textures)</li>
-		<li>2010-04-15: Render beach (natural=beach)</li>
-		<li>2010-04-15: Vastly improved rendering of railways</li>
-		<li>2010-04-15: Render litterboxes (amenity=post_box) for testing</li>
-		<li>2010-04-15: Change scale of single trees (natural=tree) to 0.2</li>
-		<li>2010-04-14: Add rendering of stadiums (leisure=stadium)</li>
-		<li>2010-04-14: Add rendering of single trees (natural=tree)</li>
-		<li>2010-04-09: Add rendering of obelisks (preliminary)</li>
-		<li>2010-04-08: Add rendering of residential areas</li>
-		<li>2010-04-07: initial version 0.1.2 from <a href="http://osm.kyblsoft.cz/3dmapa/">http://osm.kyblsoft.cz/3dmapa/</a></li>
-	</ul>
 	
+	<div id="github-commits-osm2pov"></div>
 	</div>
 	
 	<div id="bottom">

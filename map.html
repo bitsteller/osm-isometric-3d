@@ -4,8 +4,13 @@
 	<head>
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		<title>3D map</title>
-		<script type="text/javascript" src="khtml_all.js"> </script> 
-		<script type="text/javascript" src="osm-isometric-3d.js"> </script> 
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+		<script type="text/javascript" src="js/khtml_all.js"> </script> 
+		<script type="text/javascript" src="js/osm-isometric-3d.js"></script> 
+		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+		<script src="js/github.js"></script>
+		<script src="js/md5.js"></script>
+		<script src="js/github.commits.widget.js"></script>
 	</head>
 	<body onload="initMap()">
 		<div id="info"><div id="backlink"><a href="index.html">More information</a></div>City: <select id="city_select" size="1"  onchange="selectedCity()"></select> 

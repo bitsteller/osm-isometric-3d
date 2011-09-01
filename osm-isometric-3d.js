@@ -49,7 +49,7 @@ function getHumanReadableDate(date) {
 	}
 	else if(diff > measures.day) {
 		amount = Math.round(diff/measures.day);
-		dateStr = ((amount > 1) ? amount + " " + "days ago":"yesterday");
+		dateStr = ((amount > 1) ? amount + " " + "days ago":"one day ago");
 	} 
 	else if(diff > measures.hour) {
 		amount = Math.round(diff/measures.hour);

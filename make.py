@@ -393,7 +393,7 @@ if len(sys.argv)>1:
 			render_tiles(id)
 			generate_tiles(id)
 		elif action=="upload" and len(sys.argv)==3:
-			upload_city(city_id)
+			upload_tiles(city_id)
 			update_city_state(city_id, "READY", "")
 		elif action=="download" and len(sys.argv)==3:
 			download_city(city_id)

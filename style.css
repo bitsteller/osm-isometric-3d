@@ -44,6 +44,10 @@ table {
 	font-size: 11px;
 }
 
+.image {
+	float:right;
+}
+
 #page{
 	max-width:800px;
 	clear: both; 
@@ -54,7 +58,8 @@ table {
 	width:auto;
 	padding-left:10px;
 	padding-right:10px;
-	margin-bottom: 4em;
+	margin-top: 3em;
+	margin-bottom: 3em;
 	font-size:large;
 }
 

@@ -1,6 +1,24 @@
 body {
 	height:95%;
 	background: #F5F4EF;
+	background-image: -webkit-gradient(
+		 linear,
+		 left top,
+		 left bottom,
+		 color-stop(0, rgb(218,231,235)),
+		 color-stop(0.1, rgb(245,244,239)),
+		 color-stop(0.96, rgb(245,244,239)),
+		 color-stop(1, rgb(224,224,224))
+	);
+	background-image: -moz-linear-gradient(
+		 center top,
+		 rgb(218,231,235) 0%,
+		 rgb(245,244,239) 10%,
+		 rgb(245,244,239) 96%,
+		 rgb(224,224,224) 100%
+	);
+	background-repeat:no-repeat;
+	background-attachment:fixed;
 	font-family: 'Trebuchet MS', Trebuchet, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 

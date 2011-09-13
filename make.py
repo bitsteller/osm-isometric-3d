@@ -11,6 +11,15 @@ import shutil
 import math
 import Image
 
+
+COMMAND_WGET = "wget"
+COMMAND_OSMOSIS = "osmosis/osmosis-0.37/bin/osmosis"
+COMMAND_OSM2POV = "osm2pov/osm2pov"
+COMMAND_POVRAY = "povray"
+COMMAND_MOGRIFY = "mogrify"
+COMMAND_TWIDGE = "twidge/twidge-1.0.6-linux-i386-bin"
+
+
 application_name = "osm2pov-make"
 version_number = "0.1.0"
 
@@ -175,14 +184,14 @@ def download_osm(source):
 	filename = source.split("/")[-1]
 	
 	if file_exists(filename) == False:
-		execute_cmd("Downloading '" + source + "'", "wget " + source)
+		execute_cmd("Downloading '" + source + "'", COMMAND_WGET + " " + source)
 
 # Trim a osm file
 def trim_osm(sourcefile, id, top, left, bottom, right):
 	filename = id + ".osm"
 	
 	if file_exists(filename) == False:
-		command  = 'osmosis/osmosis-0.37/bin/osmosis '
+		command  = COMMAND_OSMOSIS + ' '
 		command += '--read-bin file="' + sourcefile + '" '
 		command += '--bounding-box top=' + top + ' left=' + left + ' bottom=' + bottom + ' right=' + right + ' '
 		command += '--write-xml file="' + id + '.osm"'
@@ -217,10 +226,10 @@ def render_tiles(id):
 			pngfile = id + "-" + str(x) + "_" + str(y) + ".png"
 			tileinfo = "tile " + str(tilecount) + "/" + str(numberoftiles)
 			update_city_state(id, "WORKING", "Rendering " + tileinfo + "...")
-			execute_cmd("Generating pov file for city '" + id + "', " + tileinfo, "osm2pov/osm2pov " + osmfile + " " + povfile + " " + str(x) + " " + str(y))
-			execute_cmd("Rendering city '" + id + "', " + tileinfo, "povray +W2048 +H2048 +B100 -D +A " + povfile)
+			execute_cmd("Generating pov file for city '" + id + "', " + tileinfo, COMMAND_OSM2POV + " " + osmfile + " " + povfile + " " + str(x) + " " + str(y))
+			execute_cmd("Rendering city '" + id + "', " + tileinfo, COMMAND_POVRAY + " +W2048 +H2048 +B100 -D +A " + povfile)
 			os.remove(povfile)
-			execute_cmd("Compressing image file of city '" + id + "'" + tileinfo, "mogrify -quality 15 " + pngfile)
+			execute_cmd("Compressing image file of city '" + id + "'" + tileinfo, COMMAND_MOGRIFY + " -quality 15 " + pngfile)
 			if not(os.path.exists(tempdir + "/" + str(x))):
 				os.mkdir(tempdir + "/" + str(x))
 			execute_cmd("Moving output file of city '" + id + "'" + tileinfo, "mv " + pngfile + " " + tempdir+"/"+str(x)+"/"+str(y)+".png")
@@ -357,7 +366,7 @@ def update_city(id):
 	update_city_state(id, "WORKING", "Tweeting state...")
 	root = cities.getroot()
 	city = root.xpath("city[@id='" + id + "']")[0]
-	execute_cmd("Updating twitter status", 'twidge/twidge-1.0.6-linux-i386-bin update "' + "Updated isometric 3D map of " + city.get("name") + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
+	execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city.get("name") + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
 	update_city_state(id, "READY", "")
 	
 def version():

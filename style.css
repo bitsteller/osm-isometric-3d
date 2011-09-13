@@ -40,6 +40,26 @@ table {
 
 .box{
 	background: #fff;
+	background-image: -webkit-gradient(
+		 linear,
+		 left top,
+		 left bottom,
+		 color-stop(0, rgb(255,255,255)),
+		 color-stop(0.58, rgb(227,227,227)),
+		 color-stop(0.71, rgb(199,199,199)),
+		 color-stop(1, rgb(255,255,255))
+	);
+	background-image: -moz-linear-gradient(
+		 center top,
+		 rgb(255,255,255) 0%,
+		 rgb(227,227,227) 58%,
+		 rgb(199,199,199) 71%,
+		 rgb(255,255,255) 100%
+	);
+	-moz-background-size:100% 4px;
+	-webkit-background-size:100% 4px;
+	background-repeat:no-repeat;
+	background-position:center bottom;
 	padding: 20px;
 	clear:both;
    padding: 20px;
@@ -83,6 +103,7 @@ table {
 
 #bottom {
 	text-align:center;
+	padding-bottom:1em;
 }
 
 #logo{

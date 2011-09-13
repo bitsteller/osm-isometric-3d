@@ -10,8 +10,16 @@ Webfrontend and rendering script for generating isometric 3D maps of OSM data us
 
 This guide will help you setup osm-isometric-3d.
 
-1. TBD
-2. TBD
+1. Download and install povray (http://www.povray.org) using the package manager of your distribution or by downloading the soure and compiling yourself.
+
+2. Checkout the source of osm-isometric-3d (if you didn't already):
+
+$ git clone git@github.com:bitsteller/osm-isometric-3d.git
+$ cd osm-isometric-3d
+
+3. TBC
+
+...
 
 --------------------------------------------------------------------------------------------
  License

@@ -166,26 +166,40 @@ function loadCity() {
 		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 		var stats_last_rendering_finished = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/stats/@last-rendering-finished" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var state_date = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@date" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var state_type = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@type" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var state_message = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@message" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 	
 		//update page title
 		document.title = "3D map of " + city_name;
 		//update state info
 		var div=document.getElementById("state");
-		if (stats_last_rendering_finished == "") {
-			var newNode=document.createTextNode("Last update: " + "n/a");
-		}
-		else {
-			var lastUpdateStr = "Last update: ";
-			try {
-		 		var date = new Date(parseInt(stats_last_rendering_finished));
-		 		lastUpdateStr += getHumanReadableDate(date);
+		if (state_type == "WORKING") {
+		 	div.innerHTML = state_message;
+		 	try {
+		 		var date_state = new Date(parseInt(state_date));
+		 		div.innerHTML += '<br/><div class="timestamp">' + getHumanReadableDate(date_state) + "</div>";
 		 	}
 		 	catch (err) {
-		 		lastUpdateStr += stats_last_rendering_finished;
+				
 		 	}
-		 	var newNode=document.createTextNode(lastUpdateStr);
-		}
-		div.replaceChild(newNode,div.childNodes[0]);
+		 }
+		 else {
+		 	var lastUpdateStr = "Last update: ";
+		 	if (stats_last_rendering_finished == "") {
+		 		lastUpdateStr += "n/a";
+			}
+			else {
+				try {
+			 		var date = new Date(parseInt(stats_last_rendering_finished));
+			 		lastUpdateStr += getHumanReadableDate(date);
+			 	}
+			 	catch (err) {
+			 		lastUpdateStr += stats_last_rendering_finished;
+			 	}
+			}
+			div.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
+		 }
 	
 		map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12),(area_left+area_right)/2.0),13);
 	

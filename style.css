@@ -56,8 +56,7 @@ table {
 		 rgb(199,199,199) 71%,
 		 rgb(255,255,255) 100%
 	);
-	-moz-background-size:100% 4px;
-	-webkit-background-size:100% 4px;
+	background-size:100% 4px;
 	background-repeat:no-repeat;
 	background-position:center bottom;
 	padding: 20px;
@@ -121,7 +120,7 @@ table {
 }
 
 #state{
-	
+	padding-left:10px;
 }
 
 #backlink{

@@ -149,8 +149,15 @@ function initIndex() {
 /* for map.html                            */
 /*-----------------------------------------*/
 
-function refreshState(city_id) {
+function refreshState(repeat) {
 	loadCitiesXml();
+	var city_id = location.href.substr(location.href.indexOf("#")+1);
+	var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+	if (city_name == "") {
+		document.getElementById("state").data = "Last update: unkown";
+		alert("404 - City not found");
+		return;
+	}
 	var stats_last_rendering_finished = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/stats/@last-rendering-finished" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 	var state_date = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@date" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 	var state_type = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@type" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
@@ -186,12 +193,14 @@ function refreshState(city_id) {
 		div.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
 	 }
 	 
- 	if (working == true) {
-		setTimeout('refreshState("' + city_id + '")',5000); //reload every 5 secs
-	}
-	else {
-		setTimeout('refreshState("' + city_id + '")',60000); //reload every minute
-	}
+	 if (repeat) {
+	  	if (working) {
+			setTimeout('refreshState(true)',5000); //reload every 5 secs
+		}
+		else {
+			setTimeout('refreshState(true)',60000); //reload every minute
+		}
+	 }
 }
 
 function loadCity() {
@@ -201,7 +210,6 @@ function loadCity() {
 		var city_id = location.href.substr(location.href.indexOf("#")+1);
 		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 		if (city_name == "") {
-			document.getElementById("state").data = "Last update: unkown";
 			alert("404 - City not found");
 			return;
 		}
@@ -226,7 +234,7 @@ function loadCity() {
 		 	}
 		 }
 		 
-		 refreshState(city_id);
+		 refreshState(false);
 	 }
 }
  
@@ -264,4 +272,5 @@ function initMap(){
 
 	loadCity();
 	window.onhashchange = loadCity;
+	refreshState(true);
 }

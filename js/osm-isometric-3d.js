@@ -253,11 +253,14 @@ function loadCity() {
 					}
 					map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),zoom);
 					city_id = getCityByLatLon(lat,lon);
+					if (city_id == "") {
+						alert("404 - Sorry, the position is out of any rendered area.");
+					}
 					current_city_id = city_id;
 					city_name = citiesXml.evaluate("//cities/city[@id='" + current_city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 				}
 				catch (err) {
-					alert("Parsing coordinates failed. Check the URL format.");
+					alert("404 - Parsing coordinates failed. Check the URL format.");
 				}
 			}
 			else {

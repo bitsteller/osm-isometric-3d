@@ -155,7 +155,6 @@ function refreshState(repeat) {
 	var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 	if (city_name == "") {
 		document.getElementById("state").data = "Last update: unkown";
-		alert("404 - City not found");
 		return;
 	}
 	var stats_last_rendering_finished = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/stats/@last-rendering-finished" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
@@ -209,32 +208,41 @@ function loadCity() {
 		loadCitiesXml();
 		var city_id = location.href.substr(location.href.indexOf("#")+1);
 		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		if (city_name == "") {
-			alert("404 - City not found");
-			return;
-		}
-		//get values from cities.xml
-		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		if (city_name != "") {
+			//get values from cities.xml
+			var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+			var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+			var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+			var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 	
-		//update page title
-		document.title = "3D map of " + city_name;
+			//update page title
+			document.title = "3D map of " + city_name;
 		
-		map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12),(area_left+area_right)/2.0),13);
+			map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12),(area_left+area_right)/2.0),13);
 	
-		 var select=document.getElementById("city_select");
-		 for (var i = 0; i < select.length; i++) {
-		 	if (select.options[i].value == city_id) {
-		 		select.options[i].selected = true;
-		 	}
-		 	else {
-		 		select.options[i].selected = false;
-		 	}
-		 }
-		 
-		 refreshState(false);
+			 var select=document.getElementById("city_select");
+			 for (var i = 0; i < select.length; i++) {
+			 	if (select.options[i].value == city_id) {
+			 		select.options[i].selected = true;
+			 	}
+			 	else {
+			 		select.options[i].selected = false;
+			 	}
+			 }
+			 
+			 refreshState(false);
+		}
+		else {
+			var location_str = location.href.substr(location.href.indexOf("#")+1);
+			var position = location_str.split(",");
+			if (position.length == 2) {
+				alert(position[0]);
+				alert(position[1]);
+			}
+			else {
+				alert("404 - City not found");
+			}
+		}
 	 }
 }
  

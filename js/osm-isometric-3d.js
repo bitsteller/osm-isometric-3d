@@ -244,30 +244,25 @@ function loadCity() {
 			var location_str = location.href.substr(location.href.indexOf("#")+1);
 			var position = location_str.split(",");
 			if (position.length == 2 || position.length==3) { //url format: map.html#lat,lon[,zoom]
-				try {
-					var lat = parseFloat(position[0]);
-					var lon = parseFloat(position[1]);
-					var zoom = 14; //default zoom
-					if (position.length==3) {
-						zoom = parseInt(position[2]);
-					}
-					map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),zoom);
-					city_id = getCityByLatLon(lat,lon);
-					if (city_id == "") {
-						alert("404 - Sorry, the position is out of any rendered area.");
-					}
-					current_city_id = city_id;
-					city_name = citiesXml.evaluate("//cities/city[@id='" + current_city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+				var lat = parseFloat(position[0]);
+				var lon = parseFloat(position[1]);
+				var zoom = 14; //default zoom
+				if (position.length==3) {
+					zoom = parseInt(position[2]);
 				}
-				catch (err) {
-					alert("404 - Parsing coordinates failed. Check the URL format.");
+				map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),zoom);
+				city_id = getCityByLatLon(lat,lon);
+				if (city_id == "") {
+					alert("404 - Sorry, the position is out of any rendered area or the URL couldn't be parsed.");
 				}
+				current_city_id = city_id;
+				city_name = citiesXml.evaluate("//cities/city[@id='" + current_city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 			}
 			else {
 				alert("404 - City not found");
 			}
 		}
-		//update page title
+		//update page title and city list
 		document.title = "3D map of " + city_name;
 		 var select=document.getElementById("city_select");
 		 for (var i = 0; i < select.length; i++) {

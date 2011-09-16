@@ -235,11 +235,15 @@ function loadCity() {
 		else {
 			var location_str = location.href.substr(location.href.indexOf("#")+1);
 			var position = location_str.split(",");
-			if (position.length == 2) {
+			if (position.length == 2 || position.length==3) {
 				try {
 					var lat = parseFloat(position[0]);
 					var lon = parseFloat(position[1]);
-					map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),14);
+					var zoom = 14;
+					if (position.length==3) {
+						zoom = parseInt(position[2]);
+					}
+					map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),zoom);
 				}
 				catch (err) {
 					alert("Parsing coordinates failed. Check the URL format.");

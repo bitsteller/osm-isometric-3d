@@ -236,8 +236,14 @@ function loadCity() {
 			var location_str = location.href.substr(location.href.indexOf("#")+1);
 			var position = location_str.split(",");
 			if (position.length == 2) {
-				alert(position[0]);
-				alert(position[1]);
+				try {
+					var lat = parseFloat(position[0]);
+					var lon = parseFloat(position[1]);
+					map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),14);
+				}
+				catch (err) {
+					alert("Parsing coordinates failed. Check the URL format.");
+				}
 			}
 			else {
 				alert("404 - City not found");

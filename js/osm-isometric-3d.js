@@ -4,6 +4,7 @@
 
 var citiesXml = null;
 var map=null;
+var current_city_id = "";
 
 var measures = {
 	second: 1,
@@ -151,7 +152,7 @@ function initIndex() {
 
 function refreshState(repeat) {
 	loadCitiesXml();
-	var city_id = location.href.substr(location.href.indexOf("#")+1);
+	var city_id = current_city_id;
 	var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 	if (city_name == "") {
 		document.getElementById("state").data = "Last update: unkown";
@@ -202,6 +203,27 @@ function refreshState(repeat) {
 	 }
 }
 
+function getCityByLatLon(lat,lon) {
+	loadCitiesXml();
+	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+	var select=document.getElementById("city_select");
+
+	var city = city_iterator.iterateNext();
+	while (city) {
+		var city_id = city.textContent;		
+		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		
+		if (area_bottom <= lat && lat <= area_top && area_left <= lon && lon <= area_right) {
+			return city_id;
+		}
+		city = city_iterator.iterateNext();
+	}
+	return "";
+}
+
 function loadCity() {
 	//set map center and zoom
 	 if (location.href.indexOf("#") != -1) {
@@ -214,36 +236,25 @@ function loadCity() {
 			var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 			var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 			var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-	
-			//update page title
-			document.title = "3D map of " + city_name;
-		
+			
 			map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12),(area_left+area_right)/2.0),13);
-	
-			 var select=document.getElementById("city_select");
-			 for (var i = 0; i < select.length; i++) {
-			 	if (select.options[i].value == city_id) {
-			 		select.options[i].selected = true;
-			 	}
-			 	else {
-			 		select.options[i].selected = false;
-			 	}
-			 }
-			 
-			 refreshState(false);
+		   current_city_id = city_id;
 		}
 		else {
 			var location_str = location.href.substr(location.href.indexOf("#")+1);
 			var position = location_str.split(",");
-			if (position.length == 2 || position.length==3) {
+			if (position.length == 2 || position.length==3) { //url format: map.html#lat,lon[,zoom]
 				try {
 					var lat = parseFloat(position[0]);
 					var lon = parseFloat(position[1]);
-					var zoom = 14;
+					var zoom = 14; //default zoom
 					if (position.length==3) {
 						zoom = parseInt(position[2]);
 					}
 					map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),zoom);
+					city_id = getCityByLatLon(lat,lon);
+					current_city_id = city_id;
+					city_name = citiesXml.evaluate("//cities/city[@id='" + current_city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 				}
 				catch (err) {
 					alert("Parsing coordinates failed. Check the URL format.");
@@ -253,6 +264,18 @@ function loadCity() {
 				alert("404 - City not found");
 			}
 		}
+		//update page title
+		document.title = "3D map of " + city_name;
+		 var select=document.getElementById("city_select");
+		 for (var i = 0; i < select.length; i++) {
+		 	if (select.options[i].value == city_id) {
+		 		select.options[i].selected = true;
+		 	}
+		 	else {
+		 		select.options[i].selected = false;
+		 	}
+		 }
+		 refreshState(false);
 	 }
 }
  

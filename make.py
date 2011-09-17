@@ -13,7 +13,7 @@ import Image
 
 
 COMMAND_WGET = "wget"
-COMMAND_OSMOSIS = "osmosis/osmosis-0.37/bin/osmosis"
+COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 COMMAND_OSM2POV = "osm2pov/osm2pov"
 COMMAND_POVRAY = "povray"
 COMMAND_MOGRIFY = "mogrify"

@@ -61,9 +61,39 @@ table {
 	background-position:center bottom;
 	padding: 20px;
 	clear:both;
-   padding: 20px;
    margin-top: 2em;
    margin-bottom: 2em;
+
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+}
+
+.mapbox{
+	height:90%;
+	background: #fff;
+	background-image: -webkit-gradient(
+		 linear,
+		 left top,
+		 left bottom,
+		 color-stop(0, rgb(255,255,255)),
+		 color-stop(0.58, rgb(227,227,227)),
+		 color-stop(0.71, rgb(199,199,199)),
+		 color-stop(1, rgb(255,255,255))
+	);
+	background-image: -moz-linear-gradient(
+		 center top,
+		 rgb(255,255,255) 0%,
+		 rgb(227,227,227) 58%,
+		 rgb(199,199,199) 71%,
+		 rgb(255,255,255) 100%
+	);
+	background-size:100% 4px;
+	background-repeat:no-repeat;
+	background-position:center bottom;
+	padding: 20px;
+	clear:both;
+   padding: 10px;
 
 	border-radius: 10px;
 	-moz-border-radius: 10px;
@@ -129,38 +159,19 @@ table {
 }
 
 #attribution{
+	position:relative;
+	float:right;
+	z-index:2;
+	bottom:2em;
+	right:1em;
 	float:right;
 	font-size:small;
 }
 
 #map{
-	height:90%;
-	background: #fff;
-	background-image: -webkit-gradient(
-		 linear,
-		 left top,
-		 left bottom,
-		 color-stop(0, rgb(255,255,255)),
-		 color-stop(0.58, rgb(227,227,227)),
-		 color-stop(0.71, rgb(199,199,199)),
-		 color-stop(1, rgb(255,255,255))
-	);
-	background-image: -moz-linear-gradient(
-		 center top,
-		 rgb(255,255,255) 0%,
-		 rgb(227,227,227) 58%,
-		 rgb(199,199,199) 71%,
-		 rgb(255,255,255) 100%
-	);
-	-moz-background-size:100% 4px;
-	-webkit-background-size:100% 4px;
-	background-repeat:no-repeat;
-	background-position:center bottom;
-	overflow: hidden;
-	padding: 10px;
-	border-radius: 10px;
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
+	height:100%;
+	width:auto;
+	z-index:1;
 }
 
 #city_select {

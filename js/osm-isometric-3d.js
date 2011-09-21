@@ -224,6 +224,10 @@ function getCityByLatLon(lat,lon) {
 	return "";
 }
 
+function loadPermalink() {
+	//TODO
+}
+
 function loadCity() {
 	//set map center and zoom
 	 if (location.href.indexOf("#") != -1) {

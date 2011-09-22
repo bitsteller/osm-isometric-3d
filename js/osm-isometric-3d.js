@@ -225,7 +225,10 @@ function getCityByLatLon(lat,lon) {
 }
 
 function loadPermalink() {
-	//TODO
+	var center = map.center();
+	var lat = tile2lat(lat2tile(center.latitude,12)* 2.0,12);
+	var lon = center.longitude;
+	location.href = "map.html#" + lat + "," + lon + "," + map.zoom();
 }
 
 function loadCity() {

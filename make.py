@@ -22,7 +22,7 @@ COMMAND_TWIDGE = "twidge/twidge-1.0.6-linux-i386-bin"
 
 
 application_name = "osm2pov-make"
-version_number = "0.1.0"
+version_number = "0.2.0"
 
 glib.set_application_name(application_name)
 keyring_name = "login" #Keyring, where the ftp-Password is located

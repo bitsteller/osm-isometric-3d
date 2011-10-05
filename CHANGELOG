@@ -1,0 +1,10 @@
+Version 0.2.0
+	* website: added permalink support to map view
+	* website: style changes (attribution in map view)
+	* website: minor bugfixes
+	* script: twitter support optional
+	* script: used commands can be changed
+	* script: upgrade to osmosis 0.39
+
+Version 0.1.0
+ * initial version

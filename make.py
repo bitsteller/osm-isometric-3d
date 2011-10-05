@@ -11,6 +11,7 @@ import shutil
 import math
 import Image
 
+OPTION_ENABLE_TWITTER = True
 
 COMMAND_WGET = "wget"
 COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
@@ -366,7 +367,8 @@ def update_city(id):
 	update_city_state(id, "WORKING", "Tweeting state...")
 	root = cities.getroot()
 	city = root.xpath("city[@id='" + id + "']")[0]
-	execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city.get("name") + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
+	if OPTION_ENABLE_TWITTER:
+		execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city.get("name") + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
 	update_city_state(id, "READY", "")
 	
 def version():

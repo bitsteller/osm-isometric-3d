@@ -90,7 +90,18 @@ function refreshCityTable() {
 		var state_date = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@date" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 		var state_type = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@type" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 		var state_message = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@message" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+
 		 var row = document.createElement("tr");
+		 var cell0 = document.createElement("td");
+		 var image = document.createElement("img");
+		 image.setAttribute("src", "tiles/14/" + Math.round(long2tile((area_left+area_right)/2.0,14)) + "/" + Math.round(lat2tile((area_top+area_bottom)/2.0,14)/2.0) + ".png");
+		 image.setAttribute("class", "thumbnail");
+		 cell0.appendChild(image);
+		 
 		 var cell1 = document.createElement("td");
 		 var link = document.createElement("a");
 		 link.setAttribute("href", "map.html#" + city_id);
@@ -127,6 +138,7 @@ function refreshCityTable() {
 				
 		 	}
 		 }
+		 row.appendChild(cell0);
 		 row.appendChild(cell1);
 		 row.appendChild(cell2);
 		 row.appendChild(cell3);

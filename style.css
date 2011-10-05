@@ -115,6 +115,11 @@ table {
 	float:right;
 }
 
+.thumbnail {
+	width:48px;
+	height:48px;
+}
+
 #page{
 	max-width:800px;
 	clear: both; 

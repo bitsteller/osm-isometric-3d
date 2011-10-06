@@ -67,6 +67,39 @@ function getHumanReadableDate(date) {
 	return dateStr;
 }
 
+function showMessage(title, innerHTML) {
+	hideMessage();
+   var overlay = document.createElement("div");
+   overlay.setAttribute("id","overlay");
+   overlay.setAttribute("class", "overlay");
+   
+   var error = document.createElement("div");
+   error.setAttribute("id","message");
+   error.setAttribute("class", "message");
+   error.innerHTML = "<h2>" + title + "</h2>" + innerHTML;
+   
+   document.body.appendChild(error);
+   document.body.appendChild(overlay);
+}
+
+function hideMessage() {
+	try {
+		var error = document.getElementById("message");
+		document.body.removeChild(error);
+	}
+	catch (err) {
+	
+	}
+	try {
+		var overlay = document.getElementById("overlay");
+		document.body.removeChild(overlay);
+	}
+	catch (err) {
+	
+	}
+}
+
+
 /*-----------------------------------------*/
 /* for index.html                          */
 /*-----------------------------------------*/
@@ -244,6 +277,7 @@ function loadPermalink() {
 }
 
 function loadCity() {
+	hideMessage();
 	//set map center and zoom
 	 if (location.href.indexOf("#") != -1) {
 		loadCitiesXml();
@@ -272,13 +306,13 @@ function loadCity() {
 				map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),zoom);
 				city_id = getCityByLatLon(lat,lon);
 				if (city_id == "") {
-					alert("404 - Sorry, the position is out of any rendered area or the URL couldn't be parsed.");
+					showMessage("Error 404: Not found", "Sorry, but the position '" + location_str + "' is out of any rendered area or the URL couldn't be parsed. " + '<br/><br/>Try the following: <ul><li>Check the URL</li> <li>click <a href="index.html">here</a> to get a list of available cities</li>');
 				}
 				current_city_id = city_id;
 				city_name = citiesXml.evaluate("//cities/city[@id='" + current_city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 			}
 			else {
-				alert("404 - City not found");
+				showMessage("Error 404: Not found", "Sorry, but the city with the ID '" + location.href.substr(location.href.indexOf("#")+1) + "' was not found. " + '<br/><br/>Try the following: <ul><li>Check the URL</li> <li>click <a href="index.html">here</a> to get a list of available cities</li>');
 			}
 		}
 		//update page title and city list

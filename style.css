@@ -1,5 +1,6 @@
 body {
 	height:95%;
+	color: #222;
 	background: #F5F4EF;
 	background-image: -webkit-gradient(
 		 linear,
@@ -138,6 +139,7 @@ table {
    margin:auto;
    z-index: 11;
    float:center;
+   border:10px solid #aaaaaa;
 	background: #fff;
 	background-image: -webkit-gradient(
 		 linear,
@@ -146,14 +148,14 @@ table {
 		 color-stop(0, rgb(255,255,255)),
 		 color-stop(0.58, rgb(227,227,227)),
 		 color-stop(0.71, rgb(199,199,199)),
-		 color-stop(1, rgb(255,255,255))
+		 color-stop(1.0, rgb(199,199,199))
 	);
 	background-image: -moz-linear-gradient(
 		 center top,
 		 rgb(255,255,255) 0%,
 		 rgb(227,227,227) 58%,
 		 rgb(199,199,199) 71%,
-		 rgb(255,255,255) 100%
+		 rgb(199,199,199) 100%
 	);
 	background-size:100% 4px;
 	background-repeat:no-repeat;

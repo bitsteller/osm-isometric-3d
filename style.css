@@ -140,26 +140,24 @@ table {
    z-index: 11;
    float:center;
    border:10px solid #aaaaaa;
-	background: #fff;
+	background: #F5F4EF;
 	background-image: -webkit-gradient(
 		 linear,
 		 left top,
 		 left bottom,
-		 color-stop(0, rgb(255,255,255)),
-		 color-stop(0.58, rgb(227,227,227)),
-		 color-stop(0.71, rgb(199,199,199)),
-		 color-stop(1.0, rgb(199,199,199))
+		 color-stop(0, rgb(218,231,235)),
+		 color-stop(0.1, rgb(245,244,239)),
+		 color-stop(0.96, rgb(245,244,239)),
+		 color-stop(1, rgb(224,224,224))
 	);
 	background-image: -moz-linear-gradient(
 		 center top,
-		 rgb(255,255,255) 0%,
-		 rgb(227,227,227) 58%,
-		 rgb(199,199,199) 71%,
-		 rgb(199,199,199) 100%
+		 rgb(218,231,235) 0%,
+		 rgb(245,244,239) 10%,
+		 rgb(245,244,239) 96%,
+		 rgb(224,224,224) 100%
 	);
-	background-size:100% 4px;
 	background-repeat:no-repeat;
-	background-position:center bottom;
 	padding: 20px;
 	clear:both;
 

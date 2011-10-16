@@ -48,7 +48,7 @@ def deg2tile(lat_deg, lon_deg, zoom):
 	return (xtile, ytile)
 
 def signal_handler(signal, frame):
-	print 'Got SIGINT. Aborting...'
+	print("Got SIGINT. Aborting...")
 	try:
 		update_city_state(city_id, "FAILED", "Rendering aborted.")
 	except:
@@ -86,7 +86,7 @@ def dot_storbinary(ftp, cmd, fp, blocksize=4*16384): #(8192) Extend storbinary t
 		sys.stdout.write('.')
 		sys.stdout.flush()
 	conn.close()
-	print ""
+	print ("")
 	return ftp.voidresp()
 	
 def upload_file(filename):
@@ -94,7 +94,7 @@ def upload_file(filename):
 	
 	prepare_ftp()
 	
-	print "Uploading file '" + filename + "'..."
+	print ("Uploading file '" + filename + "'...")
 	try:
 		s = ftplib.FTP(ftp_url,ftp_user,ftp_password)
 		f = open("output/" + filename,'rb')
@@ -104,7 +104,7 @@ def upload_file(filename):
 		s.quit()
 	except: raise Exception("Uploading file '" + filename + "' failed.")
 	
-	print "Uploading file '" + filename + "' finished."
+	print ("Uploading file '" + filename + "' finished.")
 	
 def file_exists(filename):
 	if os.path.isfile(filename):
@@ -126,12 +126,12 @@ def execute_cmd(action, cmd, ignore_error=False):
 	if (ignore_error==False and value != 0): raise Exception(action + " failed.")
 	
 	if (value == 0):
-		print " FINISHED"
+		print(" FINISHED")
 	else:
-		print " FAILED"
+		print(" FAILED")
 		
 def update_city_state(id, state_type, message):
-	print "Updating state of city '" + id + "' to '" + state_type + " (" + message + ")'..."
+	print ("Updating state of city '" + id + "' to '" + state_type + " (" + message + ")'...")
 	root = cities.getroot()
 	city = root.xpath("city[@id='" + id + "']")[0]
 	
@@ -145,7 +145,7 @@ def update_city_state(id, state_type, message):
 	state.set("type",state_type)
 	state.set("message",message)
 	
-	print "Writing cities.xml..."
+	print("Writing cities.xml...")
 	cities.write("cities.xml")
 	
 	execute_cmd("Moving cities.xml", "cp cities.xml output/cities.xml")
@@ -154,7 +154,7 @@ def update_city_state(id, state_type, message):
 def update_city_stats(id):
 	global date_start, date_end
 	
-	print "Updating stats of city '" + id + "'..."
+	print("Updating stats of city '" + id + "'...")
 	root = cities.getroot()
 	city = root.xpath("city[@id='" + id + "']")[0]
 	
@@ -177,7 +177,7 @@ def update_city_stats(id):
 	stats.set("last-rendering-start",date_start)
 	stats.set("last-rendering-finished",date_end)
 	
-	print "Writing cities.xml..."
+	print("Writing cities.xml...")
 	cities.write("cities.xml")
 
 # Download a osm file
@@ -275,7 +275,7 @@ def generate_tiles(id):
 						
 						boxsize = 2048/int(math.pow(2,zoom-12))
 						box = (i*boxsize, j*boxsize, i*boxsize + boxsize, j*boxsize + boxsize)
-						print box
+						print(box)
 						size = (256, 256)
 						region = im.crop(box)
 						region.thumbnail(size)
@@ -295,7 +295,7 @@ def upload_tiles(id):
 	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1)) * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
 	tilecount = 0
 	
-	print "Prepare upload..."
+	print("Prepare upload...")
 	prepare_ftp()
 	s = ftplib.FTP(ftp_url,ftp_user,ftp_password)
 	s.cwd(ftp_path)
@@ -318,7 +318,7 @@ def upload_tiles(id):
 					for j in range(0, int(math.pow(2,zoom-12))):
 						tilecount += 1
 						tile_y = int(y*math.pow(2,zoom-12)) + j
-						print "Uploading tile (zoom=" + str(zoom) + ", x=" + str(tile_x) + ", y=" + str(tile_y) + ")..."
+						print("Uploading tile (zoom=" + str(zoom) + ", x=" + str(tile_x) + ", y=" + str(tile_y) + ")...")
 						if (tilecount % 34 == 0):
 							tileinfo = "tile " + str(tilecount) + "/" + str(numberoftiles)
 							update_city_state(id, "WORKING", "Uploading, " + tileinfo + "...")
@@ -329,7 +329,7 @@ def upload_tiles(id):
 							f.close()
 						except: raise Exception("Uploading tile (zoom=" + str(zoom) + ", x=" + str(x) + ", y=" + str(y) + ") failed.")
 						
-						print "Uploading tile (zoom=" + str(zoom) + ", x=" + str(tile_x) + ", y=" + str(tile_y) + ") finished."
+						print("Uploading tile (zoom=" + str(zoom) + ", x=" + str(tile_x) + ", y=" + str(tile_y) + ") finished.")
 					s.cwd("..")
 		s.cwd("..")                           
 	s.quit()
@@ -372,19 +372,19 @@ def update_city(id):
 	update_city_state(id, "READY", "")
 	
 def version():
-	print "This is " + application_name + " " + version_number
+	print("This is " + application_name + " " + version_number)
 
 def help():
 	version()
 	name = "make.py"
-	print ""
-	print "Available commands:"
-	print " " + name + " " + "version" + " - " + "output version number"
-	print " " + name + " " + "help" + " - " + "this help"
-	print " " + name + " " + "post <city> <state> <msg>" + " - " + "post message to website"
-	print " " + name + " " + "update <city>" + " - " + "render and upload city"
-	print " " + name + " " + "render <city>" + " - " + "render city"
-	print " " + name + " " + "upload <city>" + " - " + "upload city"
+	print("")
+	print("Available commands:")
+	print(" " + name + " " + "version" + " - " + "output version number")
+	print(" " + name + " " + "help" + " - " + "this help")
+	print(" " + name + " " + "post <city> <state> <msg>" + " - " + "post message to website")
+	print(" " + name + " " + "update <city>" + " - " + "render and upload city")
+	print(" " + name + " " + "render <city>" + " - " + "render city")
+	print(" " + name + " " + "upload <city>" + " - " + "upload city")
 
 #Main program
 signal.signal(signal.SIGINT, signal_handler) #abort on CTRL-C
@@ -409,8 +409,8 @@ if len(sys.argv)>1:
 		elif action=="download" and len(sys.argv)==3:
 			download_city(city_id)
 		else:
-			print "FAILED: Wrong number of arguments for action or unkown action"
+			print("FAILED: Wrong number of arguments for action or unkown action")
 	else:
-		print "FAILED: Wrong number of arguments for action or unkown action"
+		print("FAILED: Wrong number of arguments for action or unkown action")
 else:
-	print "FAILED: You need to specifiy an action"
+	print("FAILED: You need to specifiy an action")

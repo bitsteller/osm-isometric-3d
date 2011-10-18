@@ -5,8 +5,8 @@ import os, stat, time
 from datetime import datetime,timedelta
 import getpass
 import ftplib
-import gnomekeyring as gk
-import glib
+#import gnomekeyring as gk
+#import glib
 import shutil
 import math
 import Image
@@ -23,9 +23,6 @@ COMMAND_TWIDGE = "twidge/twidge-1.0.6-linux-i386-bin"
 
 application_name = "osm2pov-make"
 version_number = "0.2.0"
-
-glib.set_application_name(application_name)
-keyring_name = "login" #Keyring, where the ftp-Password is located
 
 cities = etree.parse("cities.xml")
 city_id = ""
@@ -64,18 +61,20 @@ def prepare_ftp():
 		ftp_user = server.get("user")
 		ftp_path = server.get("path")
 		
-		if gk.is_available:
-			item_keys = gk.list_item_ids_sync(keyring_name)
-			for key in item_keys: #Use gnome-keyring, if a password for the server_url is stored there
-				item_info = gk.item_get_info_sync(keyring_name, key)
-				if item_info.get_display_name() == ftp_url:
-					ftp_password = item_info.get_secret()
-					ftp_init = True
-					
-		if ftp_init == False: #Use console if keyring did not work
-			ftp_password = getpass.getpass("FTP-Password: ")
-			ftp_init = True
-	
+		password = keyring.get_password(ftp_url, ftp_user)
+		if ftp_password == None:
+			while 1:
+				print("Password has not been stored in keychain yet. Please enter the password for the user '" + ftp_user + "' to continue. Hint: To change the username, you have to edit cities.xml.")
+				ftp_password = getpass.getpass("Please enter the password:\n")
+				if ftp_password != "":
+					ftp_init=True
+					break
+				else:
+					print ("Authorization failed (no password entered).")
+			# store the password
+			# TODO: make this optional
+			keyring.set_password(ftp_url, ftp_user, ftp_password)
+
 def dot_storbinary(ftp, cmd, fp, blocksize=4*16384): #(8192) Extend storbinary to show a dot when a block was sent
 	ftp.voidcmd('TYPE I')
 	conn = ftp.transfercmd(cmd)

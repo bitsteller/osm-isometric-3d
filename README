@@ -51,7 +51,7 @@ $ cd osm-isometric-3d
 3. Create a directory "osmosis" and extract the latetest stable version of osmosis (http://wiki.openstreetmap.org/wiki/Osmosis#Latest_Stable_Version) in that directory. 
 Make sure that the the osmosis executable file has the executeable permission set. Check if the location of the executable matches the path specified in the make.py script of osm-isometric-3d. The relevant line in make.py should look something like this: COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 
-4. TBC
+4. sudo apt-get install python-setuptools, easy_install keyring
 
 ...
 

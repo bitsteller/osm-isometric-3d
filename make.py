@@ -7,6 +7,7 @@ import getpass
 import ftplib
 #import gnomekeyring as gk
 #import glib
+import keyring
 import shutil
 import math
 import Image
@@ -146,6 +147,9 @@ def update_city_state(id, state_type, message):
 	
 	print("Writing cities.xml...")
 	cities.write("cities.xml")
+
+	if not(os.path.exists("output")):
+		os.mkdir("output")
 	
 	execute_cmd("Moving cities.xml", "cp cities.xml output/cities.xml")
 	upload_file("cities.xml")

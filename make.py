@@ -12,14 +12,18 @@ import shutil
 import math
 import Image
 
+#====USER OPTIONS====
+
 OPTION_ENABLE_TWITTER = True
 
-COMMAND_WGET = "wget"
+COMMAND_CURL = "curl -OL" #if you don't have curl installed, you can change this to COMMAND_CURL = "wget"
 COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 COMMAND_OSM2POV = "osm2pov/osm2pov"
 COMMAND_POVRAY = "povray"
 COMMAND_MOGRIFY = "mogrify"
 COMMAND_TWIDGE = "twidge/twidge-1.0.6-linux-i386-bin"
+
+#====================
 
 
 application_name = "osm2pov-make"
@@ -210,7 +214,7 @@ def download_osm(source):
 	filename = source.split("/")[-1]
 	
 	if file_exists(filename) == False:
-		execute_cmd("Downloading '" + source + "'", COMMAND_WGET + " " + source)
+		execute_cmd("Downloading '" + source + "'", COMMAND_CURL + " " + source)
 
 # Trim a osm file
 def trim_osm(sourcefile, id, top, left, bottom, right):

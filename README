@@ -8,7 +8,38 @@ Webfrontend and rendering script for generating isometric 3D maps of OSM data us
  Introduction
 --------------------------------------------------------------------------------------------
 
-This guide will help you setup osm-isometric-3d.
+some basic explanation...
+
+TBC
+
+--------------------------------------------------------------------------------------------
+ Install and configure on Mac OS X (10.7)
+--------------------------------------------------------------------------------------------
+
+1. Checkout the source of osm-isometric-3d (if you didn't already):
+
+$ git clone git@github.com:bitsteller/osm-isometric-3d.git
+$ cd osm-isometric-3d
+
+2. Install macports (if you haven't already) and do the following:
+
+$ port install py27-lxml
+$ port select python python27
+$ port install py27-pil
+
+3. easy_install keyring (http://pypi.python.org/pypi/keyring)
+
+4. Create a directory "osmosis" and extract the latetest stable version of osmosis (http://wiki.openstreetmap.org/wiki/Osmosis#Latest_Stable_Version) in that directory.
+
+5. Make sure that the the osmosis executable file has the executeable permission set (in osmosis/osmosis-0.x/bin: chmod u+x osmosis). Check if the location of the executable matches the path specified in the make.py script of osm-isometric-3d. The relevant line in make.py should look something like this: COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
+
+6. TBC
+
+...
+
+--------------------------------------------------------------------------------------------
+ Install and configure on Linux (Ubuntu)
+--------------------------------------------------------------------------------------------
 
 1. Download and install povray (http://www.povray.org) using the package manager of your distribution or by downloading the soure and compiling yourself.
 

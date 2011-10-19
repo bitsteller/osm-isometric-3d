@@ -17,11 +17,13 @@ import Image
 OPTION_ENABLE_TWITTER = True
 
 COMMAND_CURL = "curl -OL" #if you don't have curl installed, you can change this to COMMAND_CURL = "wget"
-COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
+COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosi"
 COMMAND_OSM2POV = "osm2pov/osm2pov"
 COMMAND_POVRAY = "povray"
 COMMAND_MOGRIFY = "mogrify"
 COMMAND_TWIDGE = "twidge/twidge-1.0.6-linux-i386-bin"
+
+DIR_OSM2POV = "osm2pov"
 
 #====================
 
@@ -235,6 +237,17 @@ def render_tiles(id):
 	os.mkdir("temp")
 	tempdir = "temp/" + id
 	os.mkdir(tempdir)
+
+	#copy textures and styles.inc
+	if os.path.exists("textures"):
+		shutil.rmtree("textures")
+	shutil.copytree(DIR_OSM2POV + "/textures", "textures")
+
+	if os.path.exists("styles.inc"):
+		shutil.rm("styles.inc")
+	
+	shutil.copy(DIR_OSM2POV + "/osm2pov-styles.inc", "osm2pov-styles.inc")
+
 	
 	#compute tile numbers to render
 	root = cities.getroot()

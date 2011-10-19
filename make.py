@@ -53,6 +53,23 @@ def signal_handler(signal, frame):
 		pass
 	sys.exit(0)
 
+def confirm(prompt_str, allow_empty=False, default=False):
+	fmt = (prompt_str, 'y', 'n') if default else (prompt_str, 'n', 'y')
+	if allow_empty:
+		prompt = '%s [%s]|%s: ' % fmt
+	else:
+		prompt = '%s %s|%s: ' % fmt
+	while True:
+		ans = raw_input(prompt).lower()
+		if ans == '' and allow_empty:
+			return default
+		elif ans == 'y':
+			return True
+		elif ans == 'n':
+			return False
+		else:
+			print("Please enter y or n.")
+
 def prepare_ftp():
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path, keyring_name
 	if ftp_init == False:
@@ -62,10 +79,14 @@ def prepare_ftp():
 		ftp_user = server.get("user")
 		ftp_path = server.get("path")
 		
-		password = keyring.get_password(ftp_url, ftp_user)
+		ftp_password = keyring.get_password(ftp_url, ftp_user)
 		if ftp_password == None:
 			while 1:
-				print("Password has not been stored in keychain yet. Please enter the password for the user '" + ftp_user + "' to continue. Hint: To change the username, you have to edit cities.xml.")
+				print(application_name + " needs a password to continue. Please enter the password for")
+				print(" * service: ftp")
+				print(" * domain: " + ftp_url)
+				print(" * user: " + ftp_user)
+				print("to continue. Hint: To change the username and the domain, you have to edit cities.xml.")
 				ftp_password = getpass.getpass("Please enter the password:\n")
 				if ftp_password != "":
 					ftp_init=True
@@ -73,8 +94,9 @@ def prepare_ftp():
 				else:
 					print ("Authorization failed (no password entered).")
 			# store the password
-			# TODO: make this optional
-			keyring.set_password(ftp_url, ftp_user, ftp_password)
+			if confirm("Do you want to securely store the password in the keyring of your operating system?",default=True):
+				keyring.set_password(ftp_url, ftp_user, ftp_password)
+				print("Password has been stored. You will not have to enter it again the next time.")
 
 def dot_storbinary(ftp, cmd, fp, blocksize=4*16384): #(8192) Extend storbinary to show a dot when a block was sent
 	ftp.voidcmd('TYPE I')

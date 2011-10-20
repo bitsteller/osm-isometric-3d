@@ -443,6 +443,7 @@ if len(sys.argv)>1:
 		elif action=="update" and len(sys.argv)==3:
 			update_city(city_id)
 		elif action=="render" and len(sys.argv)==3:
+			download_city(city_id)			
 			render_tiles(city_id)
 			generate_tiles(city_id)
 		elif action=="upload" and len(sys.argv)==3:

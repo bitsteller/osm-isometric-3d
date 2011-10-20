@@ -17,7 +17,7 @@ import Image
 OPTION_ENABLE_TWITTER = True
 
 COMMAND_CURL = "curl -OL" #if you don't have curl installed, you can change this to COMMAND_CURL = "wget"
-COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosi"
+COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 COMMAND_OSM2POV = "osm2pov/osm2pov"
 COMMAND_POVRAY = "povray"
 COMMAND_MOGRIFY = "mogrify"

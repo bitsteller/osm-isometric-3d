@@ -17,7 +17,7 @@ import Image
 OPTION_ENABLE_TWITTER = True
 
 COMMAND_CURL = "curl -OL" #if you don't have curl installed, you can change this to COMMAND_CURL = "wget"
-COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosi"
+COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 COMMAND_OSM2POV = "osm2pov/osm2pov"
 COMMAND_POVRAY = "povray"
 COMMAND_MOGRIFY = "mogrify"
@@ -415,6 +415,27 @@ def update_city(id):
 	
 def version():
 	print("This is " + application_name + " " + version_number)
+	
+def password():
+	global ftp_url, ftp_user, ftp_password, ftp_path
+	root = cities.getroot()
+	server = root.xpath("server")[0]
+	ftp_url = server.get("url")
+	ftp_user = server.get("user")
+	ftp_path = server.get("path")
+	print("Please enter the new password for")
+	print(" * service: ftp")
+	print(" * domain: " + ftp_url)
+	print(" * user: " + ftp_user)
+	print("to continue. Hint: To change the username and the domain, you have to edit cities.xml.")
+	ftp_password = getpass.getpass("Please enter the password:\n")
+	if ftp_password != "":
+		# store the password
+		if confirm("Do you want to securely store the password in the keyring of your operating system?",default=True):
+			keyring.set_password(ftp_url, ftp_user, ftp_password)
+			print("Password has been stored.")
+	else:
+		print ("Authorization failed (no password entered).")
 
 def help():
 	version()
@@ -427,6 +448,7 @@ def help():
 	print(" " + name + " " + "update <city>" + " - " + "render and upload city")
 	print(" " + name + " " + "render <city>" + " - " + "render city")
 	print(" " + name + " " + "upload <city>" + " - " + "upload city")
+	print(" " + name + " " + "password" + " - " + "reset pasword stored in keychain")
 
 #Main program
 signal.signal(signal.SIGINT, signal_handler) #abort on CTRL-C
@@ -436,6 +458,8 @@ if len(sys.argv)>1:
 		version()
 	elif action=="help":
 		help()
+	elif action=="password":
+		password()
 	elif len(sys.argv)>2:
 		city_id = sys.argv[2]
 		if action=="post" and len(sys.argv)==5:

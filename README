@@ -16,6 +16,8 @@ TBC
  Install and configure on Mac OS X (10.7)
 --------------------------------------------------------------------------------------------
 
+WARNING: Unfortunately this guide uses a mixture of different packaging systems (MacPorts and homebrew). It is recommended to only to use homebrew, but I haven't tested it without using MacPorts yet.
+
 1. Checkout the source of osm-isometric-3d (if you didn't already):
 
 $ git clone git@github.com:bitsteller/osm-isometric-3d.git
@@ -27,15 +29,43 @@ $ port install py27-lxml
 $ port select python python27
 $ port install py27-pil
 
-3. easy_install keyring (http://pypi.python.org/pypi/keyring)
+3. Install python modules:
+
+$ easy_install keyring
+$ easy_install oil
 
 4. Create a directory "osmosis" and extract the latetest stable version of osmosis (http://wiki.openstreetmap.org/wiki/Osmosis#Latest_Stable_Version) in that directory.
 
 5. Make sure that the the osmosis executable file has the executeable permission set (in osmosis/osmosis-0.x/bin: chmod u+x osmosis). Check if the location of the executable matches the path specified in the make.py script of osm-isometric-3d. The relevant line in make.py should look something like this: COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 
-6. TBC
+6. Install gcc 4.5 (see http://wiki.openstreetmap.org/wiki/Osm2pov for more information)
 
-...
+$ sudo port install gcc45
+$ sudo mv /usr/bin/g++ /usr/bin/g++.old
+$ sudo ln -sf /opt/local/bin/g++-mp-4.4 g++
+
+7. Install renderer and tools (the --use-clang option for povray is important, because otherwise povray will only produce empty images)
+
+$ sudo brew install povray --use-clang 
+$ sudo brew install imagemagick
+
+8. Optional: Install twidge for twitter support for finished renderings
+
+$ sudo brew install haskell
+$ cabal update
+$ cabal install twidge
+
+Add the following lines to your ~/.bash_profile file:
+PATH=$PATH:~/.cabal/bin/
+export PATH
+
+
+If you don't wan't to use twitter, disable the OPTION_ENABLE_TWITTER in the file make.py by changing the line
+
+OPTION_ENABLE_TWITTER = True
+into
+OPTION_ENABLE_TWITTER = False
+
 
 --------------------------------------------------------------------------------------------
  Install and configure on Linux (Ubuntu)

@@ -21,7 +21,7 @@ COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 COMMAND_OSM2POV = "osm2pov/osm2pov"
 COMMAND_POVRAY = "povray"
 COMMAND_MOGRIFY = "mogrify"
-COMMAND_TWIDGE = "twidge/twidge-1.0.6-linux-i386-bin"
+COMMAND_TWIDGE = "twidge"
 
 DIR_OSM2POV = "osm2pov"
 

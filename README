@@ -55,9 +55,14 @@ $ sudo brew install haskell
 $ cabal update
 $ cabal install twidge
 
-Add the following lines to your ~/.bash_profile file:
-PATH=$PATH:~/.cabal/bin/
-export PATH
+Add ~/.cabal/bin to your PATH:
+
+$ sudo vim /etc/paths.d/Cabal
+and insert the line
+
+~/.cabal/bin
+
+into the file.
 
 
 If you don't wan't to use twitter, disable the OPTION_ENABLE_TWITTER in the file make.py by changing the line

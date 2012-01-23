@@ -234,15 +234,15 @@ table {
 #permalink{
         background-image:url(img/link.png);
 	float:right;
-	width:32px;
-	height:32px;
+	width:24px;
+	height:24px;
 }
 
 #permalink:hover{
         background-image:url(img/link_highlight.png);
 	float:right;
-	width:32px;
-	height:32px;
+	width:24px;
+	height:24px;
 }
 
 #city_select {

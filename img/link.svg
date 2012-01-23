@@ -16,8 +16,8 @@
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="link.svg"
    inkscape:export-filename="/Users/nils/Documents/Github/osm-isometric-3d/img/link.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-xdpi="67.5"
+   inkscape:export-ydpi="67.5">
   <defs
      id="defs2987" />
   <sodipodi:namedview
@@ -28,15 +28,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="10"
-     inkscape:cx="0.7873285"
+     inkscape:cx="6.437329"
      inkscape:cy="19.027907"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="1386"
+     inkscape:window-width="1387"
      inkscape:window-height="856"
-     inkscape:window-x="54"
+     inkscape:window-x="53"
      inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
@@ -47,7 +47,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,16 +57,16 @@
      inkscape:groupmode="layer">
     <g
        id="g3789"
-       transform="translate(0.43002313,-0.07265659)"
+       transform="matrix(0.90719102,0,0,0.90719102,1.9657759,0.62648008)"
        style="opacity:0.4">
       <path
          inkscape:connector-curvature="0"
          id="path3017"
-         d="m 8.636178,17.961749 -5.4018582,5.465502 c -3.7670992,4.353688 1.0080631,8.802011 4.7661072,4.851208 l 0,0 0,0 c 9.911646,-10.028423 9.769399,-10.169014 9.769399,-10.169014 2.124456,-2.358887 1.773455,-4.719936 0.385156,-5.773181"
-         style="fill:none;stroke:#000000;stroke-width:2.50000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+         d="m 8.636178,20.109011 -5.4018582,5.465502 c -3.7670992,4.353688 1.0080631,8.802011 4.7661072,4.851208 l 0,0 0,0 c 9.911646,-10.028423 9.769399,-10.169014 9.769399,-10.169014 2.124456,-2.358887 1.773455,-4.719936 0.385156,-5.773181"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
       <path
          inkscape:connector-curvature="0"
-         style="fill:none;stroke:#000000;stroke-width:2.50000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          d="M 22.303776,13.783564 27.705634,8.318062 C 31.472733,3.964374 26.697571,-0.4839486 22.939527,3.466854 l 0,0 0,0 c -9.911646,10.028423 -9.769399,10.169014 -9.769399,10.169014 -2.124456,2.358887 -1.773455,4.719936 -0.385156,5.773181"
          id="path3019" />
     </g>

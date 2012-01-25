@@ -20,7 +20,6 @@ COMMAND_CURL = "curl -OL" #if you don't have curl installed, you can change this
 COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 COMMAND_OSM2POV = "osm2pov/osm2pov"
 COMMAND_POVRAY = "povray"
-COMMAND_MOGRIFY = "mogrify"
 COMMAND_TWIDGE = "twidge"
 
 DIR_OSM2POV = "osm2pov"
@@ -272,7 +271,6 @@ def render_tiles(id):
 			execute_cmd("Generating pov file for city '" + id + "', " + tileinfo, COMMAND_OSM2POV + " " + osmfile + " " + povfile + " " + str(x) + " " + str(y))
 			execute_cmd("Rendering city '" + id + "', " + tileinfo, COMMAND_POVRAY + " +W2048 +H2048 +B100 -D +A " + povfile)
 			os.remove(povfile)
-			execute_cmd("Compressing image file of city '" + id + "'" + tileinfo, COMMAND_MOGRIFY + " -quality 15 " + pngfile)
 			if not(os.path.exists(tempdir + "/" + str(x))):
 				os.mkdir(tempdir + "/" + str(x))
 			execute_cmd("Moving output file of city '" + id + "'" + tileinfo, "mv " + pngfile + " " + tempdir+"/"+str(x)+"/"+str(y)+".png")

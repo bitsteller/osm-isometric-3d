@@ -44,10 +44,9 @@ $ sudo port install gcc45
 $ sudo mv /usr/bin/g++ /usr/bin/g++.old
 $ sudo ln -sf /opt/local/bin/g++-mp-4.4 g++
 
-7. Install renderer and tools (the --use-clang option for povray is important, because otherwise povray will only produce empty images)
+7. Install renderer (the --use-clang option for povray is important, because otherwise povray will only produce empty images)
 
 $ sudo brew install povray --use-clang 
-$ sudo brew install imagemagick
 
 8. Optional: Install twidge for twitter support for finished renderings
 

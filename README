@@ -38,7 +38,7 @@ $ easy_install oil
 
 5. Make sure that the the osmosis executable file has the executeable permission set (in osmosis/osmosis-0.x/bin: chmod u+x osmosis). Check if the location of the executable matches the path specified in the make.py script of osm-isometric-3d. The relevant line in make.py should look something like this: COMMAND_OSMOSIS = "osmosis/osmosis-0.39/bin/osmosis"
 
-6. Install gcc 4.5 (see http://wiki.openstreetmap.org/wiki/Osm2pov for more information)
+6. Install gcc 4.5 (see http://wiki.openstreetmap.org/wiki/Osm2pov_on_the_Mac for more information)
 
 $ sudo port install gcc45
 $ sudo mv /usr/bin/g++ /usr/bin/g++.old

@@ -410,6 +410,49 @@ def update_city(id):
 	if OPTION_ENABLE_TWITTER:
 		execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city.get("name") + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
 	update_city_state(id, "READY", "")
+
+def getNumberOfTiles(top,left,bottom,right):
+	#compute tile numbers to render
+	mintile_x, mintile_y = deg2tile(float(top),float(left),12)
+	maxtile_x, maxtile_y = deg2tile(float(bottom),float(right),12)
+	mintile_y = int(math.floor((mintile_y/2)))
+	maxtile_y = int(math.ceil((maxtile_y/2)))
+	
+	numberoftiles = (maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1)
+	return numberoftiles
+
+
+def expand_city(id):
+	root = cities.getroot()
+	city = root.xpath("city[@id='" + id + "']")[0]
+	area = city.xpath("area")[0]
+	
+	top = float(area.get("top"))
+	left = float(area.get("left"))
+	bottom = float(area.get("bottom"))
+	right = float(area.get("right"))
+
+	numberoftiles = getNumberOfTiles(top,left,bottom,right)
+
+	while getNumberOfTiles(top,left,bottom,right) == numberoftiles:
+		top += 0.01
+	top -= 0.01
+
+	while getNumberOfTiles(top,left,bottom,right) == numberoftiles:
+		left -= 0.01
+	left += 0.01
+
+	while getNumberOfTiles(top,left,bottom,right) == numberoftiles:
+		bottom -= 0.01
+	bottom += 0.01
+
+	while getNumberOfTiles(top,left,bottom,right) == numberoftiles:
+		right += 0.01
+	right -= 0.01
+
+	print('top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
+
+	
 	
 def version():
 	print("This is " + application_name + " " + version_number)
@@ -447,6 +490,7 @@ def help():
 	print(" " + name + " " + "render <city>" + " - " + "render city")
 	print(" " + name + " " + "upload <city>" + " - " + "upload city")
 	print(" " + name + " " + "password" + " - " + "reset pasword stored in keychain")
+	print(" " + name + " " + "expand" + " - " + "compute city bounds that minimize the unused border")	
 
 #Main program
 signal.signal(signal.SIGINT, signal_handler) #abort on CTRL-C
@@ -473,6 +517,8 @@ if len(sys.argv)>1:
 			update_city_state(city_id, "READY", "")
 		elif action=="download" and len(sys.argv)==3:
 			download_city(city_id)
+		elif action=="expand" and len(sys.argv)==3:
+			expand_city(city_id)
 		else:
 			print("FAILED: Wrong number of arguments for action or unkown action")
 	else:

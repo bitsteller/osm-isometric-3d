@@ -427,12 +427,16 @@ def expand_city(id):
 	city = root.xpath("city[@id='" + id + "']")[0]
 	area = city.xpath("area")[0]
 	
-	top = float(area.get("top"))
-	left = float(area.get("left"))
-	bottom = float(area.get("bottom"))
-	right = float(area.get("right"))
+	top = round(float(area.get("top")),2)
+	left = round(float(area.get("left")),2)
+	bottom = round(float(area.get("bottom")),2)
+	right = round(float(area.get("right")),2)
 
 	numberoftiles = getNumberOfTiles(top,left,bottom,right)
+
+	print("Original: ")
+	print('top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
+	print("Number of tiles: " + str(numberoftiles))
 
 	while getNumberOfTiles(top,left,bottom,right) == numberoftiles:
 		top += 0.01
@@ -449,7 +453,7 @@ def expand_city(id):
 	while getNumberOfTiles(top,left,bottom,right) == numberoftiles:
 		right += 0.01
 	right -= 0.01
-
+	print("Suggested:")
 	print('top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
 
 	

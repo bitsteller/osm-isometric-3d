@@ -1,3 +1,15 @@
+Version 0.3.0
+	* website: various style improvements
+	* website: added permalink icon
+	* website: added Flattr button
+	* website: added overview graphic for osm-isometric-3d
+	* script: removed dependency for mogrify
+	* script: use native keychain of OS X, Gnome and KDE
+	* script: Mac OS X now fully supported
+	* script: add expand command to compute the optimal city bounds
+	* script: detailed howto in readme for Mac OS X and Linux
+	* script: various fixes
+
 Version 0.2.0
 	* website: added permalink support to map view
 	* website: style changes (attribution in map view)

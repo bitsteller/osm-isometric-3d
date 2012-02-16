@@ -28,7 +28,7 @@ DIR_OSM2POV = "osm2pov"
 
 
 application_name = "osm2pov-make"
-version_number = "0.2.0"
+version_number = "0.3.0"
 
 cities = etree.parse("cities.xml")
 city_id = ""

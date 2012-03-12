@@ -298,7 +298,8 @@ function loadCity() {
 			var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 			var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 			
-			map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12),(area_left+area_right)/2.0),13);
+            var latlong = new L.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12), (area_left+area_right)/2.0); 
+            map.setView(latlong, 13);
 		   current_city_id = city_id;
 		}
 		else {
@@ -311,7 +312,9 @@ function loadCity() {
 				if (position.length==3) {
 					zoom = parseInt(position[2]);
 				}
-				map.centerAndZoom(new khtml.maplib.LatLng(tile2lat(lat2tile((lat),12)/2.0,12),(lon)),zoom);
+                var latlong = new L.LatLng(tile2lat(lat2tile((lat),12)/2.0,12), lon); 
+                map.setView(latlong, zoom);
+
 				city_id = getCityByLatLon(lat,lon);
 				if (city_id == "") {
 					showMessage("Error 404: Not found", "Sorry, but the position '" + location_str + "' is out of any rendered area or the URL couldn't be parsed. " + '<br/><br/>Try the following: <ul><li>Check the URL</li> <li>click <a href="index.html">here</a> to get a list of available cities</li>');
@@ -346,16 +349,15 @@ function selectedCity() {
  
 function initMap(){
 	//initialize map
-	map=new khtml.maplib.Map(document.getElementById("map"));
+    map = new L.Map('map');
 
-	map.tiles({
-	  maxzoom:15,
-	  minzoom:12,
-	  src:function(x,y,z){
-		  return "tiles/"+z+"/"+x+"/"+y+".png";
-	  },
-	  copyright:"osm"
-	})
+    var iso3d = new L.TileLayer('../tiles/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        maxZoom: 15,
+        minZoom: 12
+    });
+    
+    map.addLayer(iso3d);
 
 	loadCitiesXml();
 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);

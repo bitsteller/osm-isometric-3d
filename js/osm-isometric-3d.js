@@ -346,6 +346,36 @@ function selectedCity() {
   var wert = select.options[select.options.selectedIndex].value;
   location.href = "map.html#" + wert;
 }
+
+function keyUp (event) {
+    var keycode;
+    if (!event)
+        event = window.event;
+    if (event.which) {
+        keycode = event.which;
+    } else if (event.keyCode) {
+        keycode = event.keyCode;
+    }
+
+    switch (keycode) {
+        case 37: {
+            map.panBy(new L.Point(-20, 0));
+            break;
+        }
+        case 38: {
+            map.panBy(new L.Point(0, -20));	
+            break;
+        }
+        case 39: {
+            map.panBy(new L.Point(20, 0));	
+            break;
+        }
+        case 40: {
+            map.panBy(new L.Point(0, 20));	
+            break;
+        }
+    }
+}
  
 function initMap(){
 	//initialize map
@@ -358,6 +388,8 @@ function initMap(){
     });
     
     map.addLayer(iso3d);
+    
+    document.onkeyup = keyUp;
 
 	loadCitiesXml();
 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);

@@ -359,22 +359,31 @@ function keyUp (event) {
 
     switch (keycode) {
         case 37: {
-            map.panBy(new L.Point(-20, 0));
+            map.panBy(new L.Point(-40, 0));
             break;
         }
         case 38: {
-            map.panBy(new L.Point(0, -20));	
+            map.panBy(new L.Point(0, -40));	
             break;
         }
         case 39: {
-            map.panBy(new L.Point(20, 0));	
+            map.panBy(new L.Point(40, 0));	
             break;
         }
         case 40: {
-            map.panBy(new L.Point(0, 20));	
+            map.panBy(new L.Point(0, 40));	
             break;
         }
     }
+}
+
+function located(e) {
+    location.href = "map.html#" + e.latlng.lat + "," + e.latlng.lng + "," + map.getZoom();
+    loadCity();
+}
+
+function locate() {
+    map.locate({maxZoom:15, setView:true, enableHighAccuracy:true});
 }
  
 function initMap(){
@@ -389,7 +398,9 @@ function initMap(){
     
     map.addLayer(iso3d);
     
+    //setup event handlers
     document.onkeyup = keyUp;
+    map.on('locationfound', located);
 
 	loadCitiesXml();
 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);

@@ -232,17 +232,29 @@ table {
 }
 
 #permalink{
-        background-image:url(img/link.png);
+    margin-left:6px;
+    margin-right:6px;
+    background-image:url(img/link.png);
 	float:right;
 	width:24px;
 	height:24px;
 }
 
 #permalink:hover{
-        background-image:url(img/link_highlight.png);
+    background-image:url(img/link_highlight.png);
+}
+
+#locate{
+    margin-left:6px;
+    margin-right:6px;
+    background-image:url(img/locate.png);
 	float:right;
 	width:24px;
 	height:24px;
+}
+
+#locate:hover{
+    background-image:url(img/locate_highlight.png);
 }
 
 #city_select {
@@ -251,6 +263,4 @@ table {
 
 #footer{
 	margin-top:10px;
-	padding-left:20px;
-	padding-right:20px;
 }

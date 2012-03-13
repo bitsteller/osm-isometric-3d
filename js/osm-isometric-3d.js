@@ -5,6 +5,7 @@
 var citiesXml = null;
 var map=null;
 var current_city_id = "";
+var marker = null;
 
 var measures = {
 	second: 1,
@@ -314,6 +315,14 @@ function loadCity() {
 				}
                 var latlong = new L.LatLng(tile2lat(lat2tile((lat),12)/2.0,12), lon); 
                 map.setView(latlong, zoom);
+                
+                if (marker != null) {
+                    map.removeLayer(marker);
+                }
+                if (zoom >= 15) {
+                    marker = new L.Marker(latlong);
+                    map.addLayer(marker);
+                }
 
 				city_id = getCityByLatLon(lat,lon);
 				if (city_id == "") {

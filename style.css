@@ -215,16 +215,6 @@ table {
 	float:right;
 }
 
-#attribution{
-	position:relative;
-	float:right;
-	z-index:2;
-	bottom:2em;
-	right:1em;
-	float:right;
-	font-size:small;
-}
-
 #map{
 	height:100%;
 	width:auto;

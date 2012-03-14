@@ -287,6 +287,9 @@ function loadPermalink() {
 
 function loadCity() {
 	hideMessage();
+    if (marker != null) {
+        map.removeLayer(marker);
+    }
 	//set map center and zoom
 	 if (location.href.indexOf("#") != -1) {
 		loadCitiesXml();
@@ -316,9 +319,6 @@ function loadCity() {
                 var latlong = new L.LatLng(tile2lat(lat2tile((lat),12)/2.0,12), lon); 
                 map.setView(latlong, zoom);
                 
-                if (marker != null) {
-                    map.removeLayer(marker);
-                }
                 if (zoom >= 15) {
                     marker = new L.Marker(latlong);
                     map.addLayer(marker);
@@ -326,13 +326,20 @@ function loadCity() {
 
 				city_id = getCityByLatLon(lat,lon);
 				if (city_id == "") {
-					showMessage("Error 404: Not found", "Sorry, but the position '" + location_str + "' is out of any rendered area or the URL couldn't be parsed. " + '<br/><br/>Try the following: <ul><li>Check the URL</li> <li>click <a href="index.html">here</a> to get a list of available cities</li>');
+                    var nearestCityId = getNearestCityId(new L.LatLng(lat,lon));
+                    var msg = "Sorry, but the position '" + location_str + "' is out of any rendered area or the URL couldn't be parsed. " + '<br/><br/>Try the following: <ul>';
+                    if (nearestCityId != "") {
+                        msg += '<li>Goto the nearest city: <a href="map.html#' + nearestCityId + '">' + getCityNameById(nearestCityId) + '</a>';
+                    }
+                    msg += '<li>Check the URL</li> <li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>';
+					showMessage("Error 404: Not found", msg);
+                                 
 				}
 				current_city_id = city_id;
 				city_name = citiesXml.evaluate("//cities/city[@id='" + current_city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 			}
 			else {
-				showMessage("Error 404: Not found", "Sorry, but the city with the ID '" + location.href.substr(location.href.indexOf("#")+1) + "' was not found. " + '<br/><br/>Try the following: <ul><li>Check the URL</li> <li>click <a href="index.html">here</a> to get a list of available cities</li>');
+				showMessage("Error 404: Not found", "Sorry, but the city with the ID '" + location.href.substr(location.href.indexOf("#")+1) + "' was not found. " + '<br/><br/>Try the following: <ul><li>Check the URL</li> <li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>');
 			}
 		}
 		//update page title and city list
@@ -348,12 +355,49 @@ function loadCity() {
 		 }
 		 refreshState(false);
 	 }
+     else {
+         map.locate({maxZoom:15, setView:true, enableHighAccuracy:true});
+     }
 }
  
 function selectedCity() {
   var select=document.getElementById("city_select");
   var wert = select.options[select.options.selectedIndex].value;
   location.href = "map.html#" + wert;
+}
+
+function getNearestCityId(position) {
+    loadCitiesXml();
+	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+	var select=document.getElementById("city_select");
+    
+    var nearestCityId = "";
+    var distance = 999999;
+    
+	var city = city_iterator.iterateNext();
+	while (city) {
+        var city_id = city.textContent;
+		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		
+        var center = new L.LatLng(area_bottom + (area_top - area_bottom)/2.0, area_left + (area_right - area_left)/2.0);
+        if (position.distanceTo(center) < distance) {
+            nearestCityId = city.textContent;
+            distance = position.distanceTo(center);
+        }
+
+		city = city_iterator.iterateNext();
+	}
+	return nearestCityId;
+}
+
+function getCityNameById(city_id) {
+    loadCitiesXml();
+    var name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+
+	return name;
 }
 
 function keyUp (event) {
@@ -399,7 +443,7 @@ function initMap(){
 	//initialize map
     map = new L.Map('map');
 
-    var iso3d = new L.TileLayer('../tiles/{z}/{x}/{y}.png', {
+    var iso3d = new L.TileLayer('tiles/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
         maxZoom: 15,
         minZoom: 12

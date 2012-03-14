@@ -327,12 +327,18 @@ function loadCity() {
 				city_id = getCityByLatLon(lat,lon);
 				if (city_id == "") {
                     var nearestCityId = getNearestCityId(new L.LatLng(lat,lon));
-                    var msg = "Sorry, but the position '" + location_str + "' is out of any rendered area or the URL couldn't be parsed. " + '<br/><br/>Try the following: <ul>';
-                    if (nearestCityId != "") {
+                    if (nearestCityId != ""){
+                        var msg = "The position '" + location_str + "' is out of any rendered area. " + '<br/><br/>Try the following: <ul>';
                         msg += '<li>Goto the nearest city: <a href="map.html#' + nearestCityId + '">' + getCityNameById(nearestCityId) + '</a>';
+                        msg += '<li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>';
+                        showMessage("Sorry, but you're on a black spot!", msg);
                     }
-                    msg += '<li>Check the URL</li> <li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>';
-					showMessage("Error 404: Not found", msg);
+                    else {
+                        var msg = "Sorry, but the position '" + location_str + "' is out of any rendered area or the URL couldn't be parsed. " + '<br/><br/>Try the following: <ul>';
+                        msg += '<li>Check the URL</li> <li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>';
+                        showMessage("Error 404: Not found", msg);
+                    }
+
                                  
 				}
 				current_city_id = city_id;

@@ -436,15 +436,22 @@ function keyUp (event) {
     }
 }
 
+function locate() {
+    map.locate({maxZoom:15, setView:true, enableHighAccuracy:true});
+}
+
 function located(e) {
     location.href = "map.html#" + e.latlng.lat + "," + e.latlng.lng + "," + map.getZoom();
     loadCity();
 }
-
-function locate() {
-    map.locate({maxZoom:15, setView:true, enableHighAccuracy:true});
-}
  
+function locationfailed(e) {
+    var msg = "The geolocation process failed. " + e.message + '<br/><br/>Try the following: <ul>';
+    msg += '<li>Try again</li> <li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>';
+    showMessage("Sorry, I couldn't find out where you are.", msg);
+}
+
+
 function initMap(){
 	//initialize map
     map = new L.Map('map');
@@ -460,6 +467,8 @@ function initMap(){
     //setup event handlers
     document.onkeyup = keyUp;
     map.on('locationfound', located);
+    map.on('locationerror', locationfailed);
+
 
 	loadCitiesXml();
 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);

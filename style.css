@@ -254,3 +254,7 @@ table {
 #footer{
 	margin-top:10px;
 }
+
+#github-commits-osm2pov ul {
+    list-style-type: none;
+}

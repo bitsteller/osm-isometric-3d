@@ -215,6 +215,12 @@ table {
 	float:right;
 }
 
+#backlink a{
+	float:right;
+    font-size:medium;
+    padding-left:10px;
+}
+
 #map{
 	height:100%;
 	width:auto;

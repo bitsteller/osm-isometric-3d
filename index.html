@@ -14,16 +14,20 @@
 			{ user: 'bitsteller', repo: 'osm2pov', branch: 'master', last: 15, limitMessageTo: 30 });
 	});
   </script>
-<script type="text/javascript">
-/* <![CDATA[ */
-    (function() {
-        var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
-        s.type = 'text/javascript';
-        s.async = true;
-        s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
-        t.parentNode.insertBefore(s, t);
-    })();
-/* ]]> */</script>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        (function() {
+         var s = document.createElement('script');
+         var t = document.getElementsByTagName('script')[0];
+         
+         s.type = 'text/javascript';
+         s.async = true;
+         s.src = '//api.flattr.com/js/0.6/load.js?'+'mode=auto&popout=0';
+         
+         t.parentNode.insertBefore(s, t);
+         })();
+        /* ]]> */
+        </script>
 </head>
 <body onload="initIndex()">
 	<div id="page">
@@ -53,10 +57,14 @@
 	<div class="box">
 	  <a name="osm-isometric-3d">
 	<div style="float:right;">
-	  <a class="FlattrButton" style="display:none;" href="https://github.com/bitsteller/osm-isometric-3d"></a>
-	  <noscript><a href="http://flattr.com/thing/487731/bitstellerosm-isometric-3d-on-GitHub" target="_blank">
-	  <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
-	</div>
+        <a class="FlattrButton" style="display:none;"
+            href="https://github.com/bitsteller/osm-isometric-3d"
+            data-flattr-popout="0">
+            
+            <noscript><a href="http://flattr.com/thing/487731/bitstellerosm-isometric-3d-on-GitHub" target="_blank">
+                <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a></noscript>
+        </a>
+    </div>
 	<h2>osm-isometric-3d</h2>
 
 	<p>osm-isometric-3d is the webfrontend and script for generating and uploading the above maps and this website automatically. The script is written in Python and Javascript for the webfrontend.<br/>

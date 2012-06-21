@@ -10,8 +10,10 @@
     <script src="js/github.commits.widget.js"></script>
    <script>
 	$(function() {
+        $('#github-commits-osm-isometric-3d').githubInfoWidget(
+            { user: 'bitsteller', repo: 'osm-isometric-3d', branch: 'master', last: 5, limitMessageTo: 40 });
 		$('#github-commits-osm2pov').githubInfoWidget(
-			{ user: 'bitsteller', repo: 'osm2pov', branch: 'master', last: 15, limitMessageTo: 30 });
+			{ user: 'bitsteller', repo: 'osm2pov', branch: 'master', last: 5, limitMessageTo: 40 });
 	});
   </script>
     <script type="text/javascript">
@@ -72,20 +74,19 @@
 		<img src="img/osm-isometric-3d-overview.png"/>
 	</p>
 
-	<p><b>System requirements:</b> Unix (Linux, Mac OS), at least 1 GB of RAM. The script needs the tools <a href="http://wiki.openstreetmap.org/wiki/Osmosis">osmosis</a>, <a href="https://github.com/bitsteller/osm2pov">osm2pov</a> (see below), <a href="http://www.povray.org/">povray</a> installed to run properly (for details see the README file). The webfrontend is based on the <a href="https://github.com/robotnic/khtml.maplib">khtml.maplib</a> library.</p>
-	<p><b>More information:</b>  <a href="http://github.com/bitsteller/osm-isometric-3d">http://github.com/bitsteller/osm-isometric-3d</a></p>
+	<p><b>System requirements:</b> Unix (Linux, Mac OS), at least 2 GB of RAM. The script needs the tools <a href="http://wiki.openstreetmap.org/wiki/Osmosis">osmosis</a>, <a href="https://github.com/bitsteller/osm2pov">osm2pov</a> (see below), <a href="http://www.povray.org/">povray</a> installed to run properly (for details see the README file). The webfrontend uses the <a href="http://leaflet.cloudmade.com/">LeafletJS</a> library.</p>
+        <p><b>Latest changes:</b><div id="github-commits-osm-isometric-3d"></div></p>
+        <p><b>More information:</b>  <a href="http://github.com/bitsteller/osm-isometric-3d">http://github.com/bitsteller/osm-isometric-3d</a></p>
 	</p>
 	</a>
 	</div>
 	<div class="box">
 	<h2>osm2pov</h2>
-	<p>The above renderings are based on the code at <a href="http://github.com/bitsteller/osm2pov">http://github.com/bitsteller/osm2pov</a>, which is a fork of <a href="http://github.com/guerda/osm2pov">http://github.com/guerda/osm2pov</a>. The code is released under the GPL v3. For more information see <a href="http://osm.kyblsoft.cz/3dmapa/">http://osm.kyblsoft.cz/3dmapa/</a>.
+	<p>osm2pov converts <a href="http://www.openstreetmap.org">OpenStreeetMap</a> data files to povray files, that can be rendered with <a href="http://www.povray.org/">povray</a>. The code that is used for the above renderings can be found at <a href="http://github.com/bitsteller/osm2pov">http://github.com/bitsteller/osm2pov</a>, which is a fork of <a href="http://github.com/guerda/osm2pov">http://github.com/guerda/osm2pov</a>. The code is released under the GPL v3.
+        
+        <p><b>Latest changes:</b><div id="github-commits-osm2pov"></div></p>
+        <p><b>More information:</b> <a href="http://osm.kyblsoft.cz/3dmapa/">http://osm.kyblsoft.cz/3dmapa/</a></p>
 	</p>
-	</div>
-	<div class="box">
-	<h2>osm2pov - rendering changes</h2>
-	
-	<div id="github-commits-osm2pov"></div>
 	</div>
 	
 	<div id="bottom">

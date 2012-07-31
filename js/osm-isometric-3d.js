@@ -406,36 +406,6 @@ function getCityNameById(city_id) {
 	return name;
 }
 
-function keyUp (event) {
-    var keycode;
-    if (!event)
-        event = window.event;
-    if (event.which) {
-        keycode = event.which;
-    } else if (event.keyCode) {
-        keycode = event.keyCode;
-    }
-
-    switch (keycode) {
-        case 37: {
-            map.panBy(new L.Point(-40, 0));
-            break;
-        }
-        case 38: {
-            map.panBy(new L.Point(0, -40));	
-            break;
-        }
-        case 39: {
-            map.panBy(new L.Point(40, 0));	
-            break;
-        }
-        case 40: {
-            map.panBy(new L.Point(0, 40));	
-            break;
-        }
-    }
-}
-
 function locate() {
     map.locate({maxZoom:15, setView:true, enableHighAccuracy:true});
 }
@@ -465,7 +435,6 @@ function initMap(){
     map.addLayer(iso3d);
     
     //setup event handlers
-    document.onkeyup = keyUp;
     map.on('locationfound', located);
     map.on('locationerror', locationfailed);
 

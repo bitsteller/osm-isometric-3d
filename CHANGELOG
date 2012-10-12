@@ -1,3 +1,11 @@
+Version 0.3.1
+	* website: switched map library from khtml to leaflet
+	* website: geolocation support
+	* website: improved permalink support
+	* website: improved github commit widget
+	* website: changed flatter buttons
+	* website: added css animations for messages
+
 Version 0.3.0
 	* website: various style improvements
 	* website: added permalink icon
@@ -19,4 +27,4 @@ Version 0.2.0
 	* script: upgrade to osmosis 0.39
 
 Version 0.1.0
- * initial version
+	* initial version

@@ -8,9 +8,13 @@ Webfrontend and rendering script for generating isometric 3D maps of OSM data us
  Introduction
 --------------------------------------------------------------------------------------------
 
-some basic explanation...
+osm-isometric-3d contains a python script to automate the rendering of isometric 3D maps of cities from OSM data. The repository also contains a webfrontend to display the maps.
 
-TBC
+After you have installed and configured osm-isometric-3d to update a rendering is as easy as typing
+
+$ make.py update <city-id>
+
+into a console.
 
 --------------------------------------------------------------------------------------------
  Install and configure on Mac OS X (10.7)

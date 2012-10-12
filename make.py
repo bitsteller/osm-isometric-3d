@@ -5,8 +5,6 @@ import os, stat, time
 from datetime import datetime,timedelta
 import getpass
 import ftplib
-#import gnomekeyring as gk
-#import glib
 import keyring
 import shutil
 import math
@@ -435,7 +433,7 @@ def expand_city(id):
 	numberoftiles = getNumberOfTiles(top,left,bottom,right)
 
 	print("Original: ")
-	print('top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
+	print(' top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
 	print("Number of tiles: " + str(numberoftiles))
 
 	while getNumberOfTiles(top,left,bottom,right) == numberoftiles:
@@ -454,10 +452,17 @@ def expand_city(id):
 		right += 0.01
 	right -= 0.01
 	print("Suggested:")
-	print('top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
+	print(' top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
 
-	
-	
+	if confirm("Do you want to overwrite the old bounds with the suggested ones?",default=False):
+		area.set("top",str(top))
+		area.set("left",str(left))
+		area.set("bottom",str(bottom))
+		area.set("right",str(right))
+
+		print("Writing cities.xml...")
+		cities.write("cities.xml")
+
 def version():
 	print("This is " + application_name + " " + version_number)
 	

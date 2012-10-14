@@ -1,29 +1,29 @@
 {
-	"city_id": "b"
-	"name": "Berlin (excerpt)"
+	"city_id": "b",
+	"name": "Berlin (excerpt)",
 	"stats": {
-		"tiles": 4
+		"tiles": 4,
 		"total_tiles": 340
-	}
+	},
 	"status": {
-		"time": 1349516799205
-		"type": "READY"
-		"message": "Rendering finished"
-		"phase": 5
-		"total_phases":5
-		"step": 100
+		"time": 1349516799205,
+		"type": "READY",
+		"message": "Rendering finished",
+		"phase": 5,
+		"total_phases":5,
+		"step": 100,
 		"total_steps":100
-	}
+	},
 	"renderings": {
 		{
-			"rendering_id": 1
-			"start": 1349515107378
-			"end": 1349516799205
-			"duration_preparation": 134951
-			"duration_render": 1349518
-			"duration_cutting": 134951
-			"duration_upload": 1349515
-			"succesful":true
+			"rendering_id": 1,
+			"start": 1349515107378,
+			"end": 1349516799205,
+			"duration_preparation": 134951,
+			"duration_render": 1349518,
+			"duration_cutting": 134951,
+			"duration_upload": 1349515,
+			"succesful":true,
 		}
 	}
 }

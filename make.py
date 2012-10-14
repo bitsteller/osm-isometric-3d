@@ -294,7 +294,6 @@ def generate_tiles(id):
 	
 	#compute tile numbers rendered
 	city = [city for city in cities["cities"] if city["city_id"] == id][0]
-
 	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
 	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
 	mintile_y = int(math.floor((mintile_y/2)))
@@ -336,7 +335,7 @@ def upload_tiles(id):
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path
 	
 	#compute tile numbers rendered
-	area = [city for city in cities["cities"] if city["city_id"] == id][0]["area"]
+	city = [city for city in cities["cities"] if city["city_id"] == id][0]
 	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
 	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
 	mintile_y = int(math.floor((mintile_y/2)))
@@ -383,6 +382,11 @@ def upload_tiles(id):
 					s.cwd("..")
 		s.cwd("..")                           
 	s.quit()
+
+def tweet_finished(id):
+	city = [city for city in cities["cities"] if city["city_id"] == id][0]
+	if OPTION_ENABLE_TWITTER:
+		execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city["name"] + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
 	
 def update_city(id):
 	global date_start, date_end
@@ -400,10 +404,7 @@ def update_city(id):
 	date_end = str(int(time.time()*1000))
 	update_city_stats(id)
 	update_city_state(id, "WORKING", "Tweeting state...")
-	root = cities.getroot()
-	city = root.xpath("city[@id='" + id + "']")[0]
-	if OPTION_ENABLE_TWITTER:
-		execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city.get("name") + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
+	tweet_finished(id)
 	update_city_state(id, "READY", "")
 
 def getNumberOfTiles(top,left,bottom,right):
@@ -418,14 +419,12 @@ def getNumberOfTiles(top,left,bottom,right):
 
 
 def expand_city(id):
-	root = cities.getroot()
-	city = root.xpath("city[@id='" + id + "']")[0]
-	area = city.xpath("area")[0]
+	city = [city for city in cities["cities"] if city["city_id"] == id][0]
 	
-	top = round(float(area.get("top")),2)
-	left = round(float(area.get("left")),2)
-	bottom = round(float(area.get("bottom")),2)
-	right = round(float(area.get("right")),2)
+	top = round(float(city["area"]["top"]),2)
+	left = round(float(city["area"]["left"]),2)
+	bottom = round(float(city["area"]["bottom"]),2)
+	right = round(float(city["area"]["right"]),2)
 
 	numberoftiles = getNumberOfTiles(top,left,bottom,right)
 
@@ -452,37 +451,40 @@ def expand_city(id):
 	print(' top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
 
 	if confirm("Do you want to overwrite the old bounds with the suggested ones?",default=False):
-		area.set("top",str(top))
-		area.set("left",str(left))
-		area.set("bottom",str(bottom))
-		area.set("right",str(right))
-#
-#		print("Writing cities.xml...")
-#		cities.write("cities.xml")
+		city["area"]["top"] =str(top)
+		city["area"]["left"] =str(left)
+		city["area"]["bottom"] =str(bottom)
+		city["area"]["right"] =str(right)
+
+		s = json.dumps(cities)
+				
+		f = open("cities.json", 'a')
+		f.write(s + "\n")
+		f.close()
 
 def version():
 	print("This is " + application_name + " " + version_number)
 	
-def password():
-	global ftp_url, ftp_user, ftp_password, ftp_path
-	root = cities.getroot()
-	server = root.xpath("server")[0]
-	ftp_url = server.get("url")
-	ftp_user = server.get("user")
-	ftp_path = server.get("path")
-	print("Please enter the new password for")
-	print(" * service: ftp")
-	print(" * domain: " + ftp_url)
-	print(" * user: " + ftp_user)
-	print("to continue. Hint: To change the username and the domain, you have to edit cities.xml.")
-	ftp_password = getpass.getpass("Please enter the password:\n")
-	if ftp_password != "":
-		# store the password
-		if confirm("Do you want to securely store the password in the keyring of your operating system?",default=True):
-			keyring.set_password(ftp_url, ftp_user, ftp_password)
-			print("Password has been stored.")
-	else:
-		print ("Authorization failed (no password entered).")
+#def password():
+#	global ftp_url, ftp_user, ftp_password, ftp_path
+#	root = cities.getroot()
+#	server = root.xpath("server")[0]
+#	ftp_url = server.get("url")
+#	ftp_user = server.get("user")
+#	ftp_path = server.get("path")
+#	print("Please enter the new password for")
+#	print(" * service: ftp")
+#	print(" * domain: " + ftp_url)
+#	print(" * user: " + ftp_user)
+#	print("to continue. Hint: To change the username and the domain, you have to edit cities.xml.")
+#	ftp_password = getpass.getpass("Please enter the password:\n")
+#	if ftp_password != "":
+#		# store the password
+#		if confirm("Do you want to securely store the password in the keyring of your operating system?",default=True):
+#			keyring.set_password(ftp_url, ftp_user, ftp_password)
+#			print("Password has been stored.")
+#	else:
+#		print ("Authorization failed (no password entered).")
 
 def help():
 	version()

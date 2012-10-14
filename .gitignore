@@ -11,5 +11,8 @@ osm2pov-styles.inc
 *.png
 *.pov
 cities.xml
+config.json
+cities.json
+status.json
 .DS_Store
 *.swp

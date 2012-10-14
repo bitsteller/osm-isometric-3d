@@ -132,7 +132,7 @@ def execute_cmd(action, cmd, ignore_error=False):
 	else:
 		print(" FAILED")
 
-def prepare_ftp():
+def prepare_ftp(force_password=True):
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path, keyring_name
 	if ftp_init == False:
 		ftp_url = config["ftp"]["url"]
@@ -140,7 +140,7 @@ def prepare_ftp():
 		ftp_path = config["ftp"]["path"]
 		
 		ftp_password = keyring.get_password(ftp_url, ftp_user)
-		if ftp_password == None:
+		if ftp_password == None or force_password == True:
 			while 1:
 				print(application_name + " needs a password to continue. Please enter the password for")
 				print(" * service: ftp")
@@ -456,35 +456,14 @@ def expand_city(id):
 		city["area"]["bottom"] =str(bottom)
 		city["area"]["right"] =str(right)
 
-		s = json.dumps(cities)
+		s = json.dumps(cities, indent=3)
 				
-		f = open("cities.json", 'a')
+		f = open("cities.json", 'w')
 		f.write(s + "\n")
 		f.close()
 
 def version():
 	print("This is " + application_name + " " + version_number)
-	
-#def password():
-#	global ftp_url, ftp_user, ftp_password, ftp_path
-#	root = cities.getroot()
-#	server = root.xpath("server")[0]
-#	ftp_url = server.get("url")
-#	ftp_user = server.get("user")
-#	ftp_path = server.get("path")
-#	print("Please enter the new password for")
-#	print(" * service: ftp")
-#	print(" * domain: " + ftp_url)
-#	print(" * user: " + ftp_user)
-#	print("to continue. Hint: To change the username and the domain, you have to edit cities.xml.")
-#	ftp_password = getpass.getpass("Please enter the password:\n")
-#	if ftp_password != "":
-#		# store the password
-#		if confirm("Do you want to securely store the password in the keyring of your operating system?",default=True):
-#			keyring.set_password(ftp_url, ftp_user, ftp_password)
-#			print("Password has been stored.")
-#	else:
-#		print ("Authorization failed (no password entered).")
 
 def help():
 	version()
@@ -509,7 +488,7 @@ if len(sys.argv)>1:
 	elif action=="help":
 		help()
 	elif action=="password":
-		password()
+		prepare_ftp(True) #change password
 	elif len(sys.argv)>2:
 		city_id = sys.argv[2]
 		if action=="post" and len(sys.argv)==5:

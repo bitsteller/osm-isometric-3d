@@ -31,6 +31,7 @@ version_number = "0.3.1"
 
 config = json.loads(open("config.json").read())
 cities = json.loads(open("cities.json").read())
+#status = json.loads(open("status.json").read())      TODO: remove
 
 ftp_init = False
 ftp_user = ""

@@ -2,10 +2,18 @@
 /* Common                                  */
 /*-----------------------------------------*/
 
-var citiesXml = null;
-var map=null;
+var cities = {};
+var status = {};
+var map = null;
 var current_city_id = "";
 var marker = null;
+
+var Modes = {
+	INDEX: 0,
+	MAP: 1
+};
+
+var mode = Modes.INDEX;
 
 var measures = {
 	second: 1,
@@ -31,16 +39,35 @@ function lat2tile(lat,zoom)  { return ((1-Math.log(Math.tan(lat*Math.PI/180) + 1
 function tile2long(x,z) {
 	return (x/Math.pow(2,z)*360-180);
 }
+
 function tile2lat(y,z) {
 	var n=Math.PI-2*Math.PI*y/Math.pow(2,z);
 	return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
 }
 
-function loadCitiesXml() {
+function loadCities() {
 	var req = new XMLHttpRequest();
-	req.open("GET", "cities.xml", false); 
+	req.open("GET", "cities.json", false); 
 	req.send(null);
-	citiesXml = req.responseXML;		
+	cities = JSON.parse(req.responseText)["cities"];
+}
+
+function loadStatus() {
+	var http_request = new XMLHttpRequest();
+	http_request.open("GET", "status.json", true);
+	http_request.onreadystatechange = function () {
+		var done = 4, ok = 200;
+		if (http_request.readyState == done && http_request.status == ok) {
+			status = JSON.parse(http_request.responseText);
+			if (mode == Modes.INDEX) {
+				refreshCityTable();
+			}
+			else if (mode == Modes.MAP) {
+				refreshState();
+			}
+		}
+	};
+	http_request.send(null);
 }
 
 function getHumanReadableDate(date) {
@@ -113,29 +140,28 @@ function hideMessage() {
 /* for index.html                          */
 /*-----------------------------------------*/
 
-function refreshCityTable() {
-  	loadCitiesXml();
-  	
+function refreshCityTable() {  	
   	//clear table
  	var table = document.getElementById("city_list").getElementsByTagName("tbody")[0];
 	while (table.firstElementChild) {
  		table.removeChild(table.firstElementChild);
 	}
  	
- 	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
- 	var city = city_iterator.iterateNext();
  	var working = false;
-	while (city) {
+	var city = null;
+	for (var i = 0; i<this.cities.length; i++) {
+		city = this.cities[i];
+		alert(city.city_id);
 		var city_id = city.textContent;		
-		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		var stats_last_rendering_finished = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/stats/@last-rendering-finished" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		var state_date = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@date" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		var state_type = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@type" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		var state_message = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@message" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+		var city_name = city.name;
+		var stats_last_rendering_finished = "TODO"; //TODO: Missing values
+		var state_date = "TODO";
+		var state_type = "TODO";
+		var state_message = "TODO"
+		var area_left = city.area.left;
+		var area_top = city.area.top;
+		var area_right = city.area.right;
+		var area_bottom = city.area.bottom;
 
 		 var row = document.createElement("tr");
 		 var cell0 = document.createElement("td");
@@ -185,19 +211,20 @@ function refreshCityTable() {
 		 row.appendChild(cell2);
 		 row.appendChild(cell3);
 		 table.appendChild(row);
-  		city = city_iterator.iterateNext();
 	}
 	if (working == true) {
-		setTimeout("refreshCityTable()",5000); //reload every 5 secs
+		setTimeout("loadStatus()",5000); //reload every 5 secs
 	}
 	else {
-		setTimeout("refreshCityTable()",60000); //reload every minute
+		setTimeout("loadStatus()",60000); //reload every minute
 	}
 
 }
  
 function initIndex() {
-	refreshCityTable();
+	mode = Modes.INDEX;
+	loadCities();
+	loadStatus();
 }
 
 /*-----------------------------------------*/
@@ -205,7 +232,6 @@ function initIndex() {
 /*-----------------------------------------*/
 
 function refreshState(repeat) {
-	loadCitiesXml();
 	var city_id = current_city_id;
 	var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 	if (city_name == "") {
@@ -423,6 +449,7 @@ function locationfailed(e) {
 
 
 function initMap(){
+	mode = Modes.MAP;
 	//initialize map
     map = new L.Map('map');
 

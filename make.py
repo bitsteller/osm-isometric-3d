@@ -104,7 +104,7 @@ def upload_file(filename):
 		dot_storbinary(s,'STOR ' + filename, f)
 		f.close()
 		s.quit()
-	except: raise Exception("Uploading file '" + filename + "' failed.")
+	except Exception as detail: raise Exception("Uploading file '" + filename + "' failed: " + str(detail))
 	
 	print ("Uploading file '" + filename + "' finished.")
 
@@ -132,7 +132,7 @@ def execute_cmd(action, cmd, ignore_error=False):
 	else:
 		print(" FAILED")
 
-def prepare_ftp(force_password=True):
+def prepare_ftp(force_password=False):
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path, keyring_name
 	if ftp_init == False:
 		ftp_url = config["ftp"]["url"]
@@ -186,6 +186,9 @@ def update_city_state(id, state_type, message):
 
 def update_city_stats(id):
 	global date_start, date_end
+
+	execute_cmd("Moving cities.json", "cp cities.json output/cities.json")
+	upload_file("cities.json")
 #	
 #	print("Updating stats of city '" + id + "'...")
 #	root = cities.getroot()

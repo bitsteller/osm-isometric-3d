@@ -17,10 +17,10 @@
          "source": "http://download.geofabrik.de/openstreetmap/europe/germany/niedersachsen.osm.pbf", 
          "name": "Uetze", 
          "area": {
-            "top": "52.58", 
-            "right": "10.28", 
-            "left": "10.11", 
-            "bottom": "52.38"
+            "top": 52.58,
+            "right": 10.28,
+            "left": 10.11,
+            "bottom": 52.38
          }
       }
    ]

@@ -1,11 +1,16 @@
 {
-	"city_id": "b",
-	"name": "Berlin (excerpt)",
-	"source": "http://download.geofabrik.de/openstreetmap/europe/germany/berlin.osm.pbf",
-	"area": {
-		"top": 52.58,
-		"left": 13.28,
-		"bottom": 52.38,
-		"right": 13.53
-	}
+	"version": 1,
+	"cities": [
+		{
+			"city_id": "b",
+			"name": "Berlin (excerpt)",
+			"source": "http://download.geofabrik.de/openstreetmap/europe/germany/berlin.osm.pbf",
+			"area": {
+				"top": 52.58,
+				"left": 13.28,
+				"bottom": 52.38,
+				"right": 13.53
+			}
+		}
+	]
 }

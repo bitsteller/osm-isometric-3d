@@ -1,4 +1,3 @@
-from lxml import etree #TODO: remove
 import sys
 import signal, os, stat, time
 from datetime import datetime,timedelta
@@ -26,11 +25,12 @@ DIR_OSM2POV = "osm2pov"
 
 
 application_name = "osm2pov-make"
-version_number = "0.3.0"
+version_number = "0.3.1"
 
 #==GLOBALS=======================
 
 config = json.loads(open("config.json").read())
+cities = json.loads(open("cities.json").read())
 
 ftp_init = False
 ftp_user = ""
@@ -38,7 +38,6 @@ ftp_url = ""
 ftp_password = ""
 ftp_path = ""
 
-cities = etree.parse("cities.xml")
 city_id = ""
 
 date_start = ""
@@ -163,56 +162,56 @@ def prepare_ftp():
 
 def update_city_state(id, state_type, message):
 	print ("Updating state of city '" + id + "' to '" + state_type + " (" + message + ")'...")
-	root = cities.getroot()
-	city = root.xpath("city[@id='" + id + "']")[0]
-	
-	if (len(city.xpath("state")) == 0):
-		etree.SubElement(city, "state")
-	state = city.xpath("state")[0]
-	
-	#Update state data
-	state_date = str(int(time.time()*1000))
-	state.set("date", state_date)
-	state.set("type",state_type)
-	state.set("message",message)
-	
-	print("Writing cities.xml...")
-	cities.write("cities.xml")
-
-	if not(os.path.exists("output")):
-		os.mkdir("output")
-	
-	execute_cmd("Moving cities.xml", "cp cities.xml output/cities.xml")
-	upload_file("cities.xml")
+#	root = cities.getroot()
+#	city = root.xpath("city[@id='" + id + "']")[0]
+#	
+#	if (len(city.xpath("state")) == 0):
+#		etree.SubElement(city, "state")
+#	state = city.xpath("state")[0]
+#	
+#	#Update state data
+#	state_date = str(int(time.time()*1000))
+#	state.set("date", state_date)
+#	state.set("type",state_type)
+#	state.set("message",message)
+#	
+#	print("Writing cities.xml...")
+#	cities.write("cities.xml")
+#
+#	if not(os.path.exists("output")):
+#		os.mkdir("output")
+#	
+#	execute_cmd("Moving cities.xml", "cp cities.xml output/cities.xml")
+#	upload_file("cities.xml")
 
 def update_city_stats(id):
 	global date_start, date_end
-	
-	print("Updating stats of city '" + id + "'...")
-	root = cities.getroot()
-	city = root.xpath("city[@id='" + id + "']")[0]
-	
-	#Update statistics
-	if (len(city.xpath("stats")) == 0):
-		etree.SubElement(city, "stats")
-	stats = city.xpath("stats")[0]
-	
-	area = root.xpath("city[@id='" + id + "']/area")[0]
-	mintile_x, mintile_y = deg2tile(float(area.get("top")),float(area.get("left")),12)
-	maxtile_x, maxtile_y = deg2tile(float(area.get("bottom")),float(area.get("right")),12)
-	mintile_y = int(math.floor((mintile_y/2)))
-	maxtile_y = int(math.ceil((maxtile_y/2)))
-	
-	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1))
-	totalnumberoftiles = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
-	
-	stats.set("tiles", str(numberoftiles))
-	stats.set("total-tiles",str(totalnumberoftiles))
-	stats.set("last-rendering-start",date_start)
-	stats.set("last-rendering-finished",date_end)
-	
-	print("Writing cities.xml...")
-	cities.write("cities.xml")
+#	
+#	print("Updating stats of city '" + id + "'...")
+#	root = cities.getroot()
+#	city = root.xpath("city[@id='" + id + "']")[0]
+#	
+#	#Update statistics
+#	if (len(city.xpath("stats")) == 0):
+#		etree.SubElement(city, "stats")
+#	stats = city.xpath("stats")[0]
+#	
+#	area = root.xpath("city[@id='" + id + "']/area")[0]
+#	mintile_x, mintile_y = deg2tile(float(area.get("top")),float(area.get("left")),12)
+#	maxtile_x, maxtile_y = deg2tile(float(area.get("bottom")),float(area.get("right")),12)
+#	mintile_y = int(math.floor((mintile_y/2)))
+#	maxtile_y = int(math.ceil((maxtile_y/2)))
+#	
+#	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1))
+#	totalnumberoftiles = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
+#	
+#	stats.set("tiles", str(numberoftiles))
+#	stats.set("total-tiles",str(totalnumberoftiles))
+#	stats.set("last-rendering-start",date_start)
+#	stats.set("last-rendering-finished",date_end)
+#	
+#	print("Writing cities.xml...")
+#	cities.write("cities.xml")
 
 # Download a osm file
 def download_osm(source):
@@ -221,6 +220,15 @@ def download_osm(source):
 	if file_exists(filename) == False:
 		execute_cmd("Downloading '" + source + "'", COMMAND_CURL + " " + source)
 
+def download_city(id):
+	city = [city for city in cities["cities"] if city["city_id"] == id][0]
+	
+	source = city["source"]
+	download_osm(source) #Download .pbf
+
+	filename = source.split("/")[-1]
+	trim_osm(filename, id, city["area"]["top"], city["area"]["left"], city["area"]["bottom"], city["area"]["right"]) #Trim and convert to .osm
+
 # Trim a osm file
 def trim_osm(sourcefile, id, top, left, bottom, right):
 	filename = id + ".osm"
@@ -228,7 +236,7 @@ def trim_osm(sourcefile, id, top, left, bottom, right):
 	if file_exists(filename) == False:
 		command  = COMMAND_OSMOSIS + ' '
 		command += '--read-bin file="' + sourcefile + '" '
-		command += '--bounding-box top=' + top + ' left=' + left + ' bottom=' + bottom + ' right=' + right + ' '
+		command += '--bounding-box top=' + str(top) + ' left=' + str(left) + ' bottom=' + str(bottom) + ' right=' + str(right) + ' '
 		command += '--write-xml file="' + id + '.osm"'
 		execute_cmd("Trimming osm file to '" + id + "'", command)
 	
@@ -253,10 +261,9 @@ def render_tiles(id):
 
 	
 	#compute tile numbers to render
-	root = cities.getroot()
-	area = root.xpath("city[@id='" + id + "']/area")[0]
-	mintile_x, mintile_y = deg2tile(float(area.get("top")),float(area.get("left")),12)
-	maxtile_x, maxtile_y = deg2tile(float(area.get("bottom")),float(area.get("right")),12)
+	area = [city for city in cities["cities"] if city["city_id"] == id][0]["area"]
+	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
+	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
 	mintile_y = int(math.floor((mintile_y/2)))
 	maxtile_y = int(math.ceil((maxtile_y/2)))
 	
@@ -286,10 +293,10 @@ def generate_tiles(id):
 	tiledir = "output/tiles"
 	
 	#compute tile numbers rendered
-	root = cities.getroot()
-	area = root.xpath("city[@id='" + id + "']/area")[0]
-	mintile_x, mintile_y = deg2tile(float(area.get("top")),float(area.get("left")),12)
-	maxtile_x, maxtile_y = deg2tile(float(area.get("bottom")),float(area.get("right")),12)
+	city = [city for city in cities["cities"] if city["city_id"] == id][0]
+
+	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
+	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
 	mintile_y = int(math.floor((mintile_y/2)))
 	maxtile_y = int(math.ceil((maxtile_y/2)))
 	
@@ -329,10 +336,9 @@ def upload_tiles(id):
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path
 	
 	#compute tile numbers rendered
-	root = cities.getroot()
-	area = root.xpath("city[@id='" + id + "']/area")[0]
-	mintile_x, mintile_y = deg2tile(float(area.get("top")),float(area.get("left")),12)
-	maxtile_x, maxtile_y = deg2tile(float(area.get("bottom")),float(area.get("right")),12)
+	area = [city for city in cities["cities"] if city["city_id"] == id][0]["area"]
+	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
+	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
 	mintile_y = int(math.floor((mintile_y/2)))
 	maxtile_y = int(math.ceil((maxtile_y/2)))
 	
@@ -377,21 +383,6 @@ def upload_tiles(id):
 					s.cwd("..")
 		s.cwd("..")                           
 	s.quit()
-
-def download_city(id):
-	root = cities.getroot()
-	city = root.xpath("city[@id='" + id + "']")[0]
-	area = city.xpath("area")[0]
-	
-	source = area.get("osm")
-	download_osm(source) #Download .pbf
-
-	top = area.get("top")
-	left = area.get("left")
-	bottom = area.get("bottom")
-	right = area.get("right")
-	filename = source.split("/")[-1]
-	trim_osm(filename, id, top, left, bottom, right) #Trim and convert to .osm
 	
 def update_city(id):
 	global date_start, date_end
@@ -465,9 +456,9 @@ def expand_city(id):
 		area.set("left",str(left))
 		area.set("bottom",str(bottom))
 		area.set("right",str(right))
-
-		print("Writing cities.xml...")
-		cities.write("cities.xml")
+#
+#		print("Writing cities.xml...")
+#		cities.write("cities.xml")
 
 def version():
 	print("This is " + application_name + " " + version_number)

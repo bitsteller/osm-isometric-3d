@@ -1,8 +1,8 @@
-from lxml import etree
+from lxml import etree #TODO: remove
 import sys
-import signal
-import os, stat, time
+import signal, os, stat, time
 from datetime import datetime,timedelta
+import json
 import getpass
 import ftplib
 import keyring
@@ -10,7 +10,7 @@ import shutil
 import math
 import Image
 
-#====USER OPTIONS====
+#==USER OPTIONS==================
 
 OPTION_ENABLE_TWITTER = True
 
@@ -22,14 +22,15 @@ COMMAND_TWIDGE = "twidge"
 
 DIR_OSM2POV = "osm2pov"
 
-#====================
+#===CONSTANTS====================
 
 
 application_name = "osm2pov-make"
 version_number = "0.3.0"
 
-cities = etree.parse("cities.xml")
-city_id = ""
+#==GLOBALS=======================
+
+config = json.loads(open("config.json").read())
 
 ftp_init = False
 ftp_user = ""
@@ -37,9 +38,14 @@ ftp_url = ""
 ftp_password = ""
 ftp_path = ""
 
+cities = etree.parse("cities.xml")
+city_id = ""
+
 date_start = ""
 date_end = ""
 
+
+#==COMMON FUNCTIONS==============
 
 def deg2tile(lat_deg, lon_deg, zoom):
 	lat_rad = math.radians(lat_deg)
@@ -73,34 +79,6 @@ def confirm(prompt_str, allow_empty=False, default=False):
 		else:
 			print("Please enter y or n.")
 
-def prepare_ftp():
-	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path, keyring_name
-	if ftp_init == False:
-		root = cities.getroot()
-		server = root.xpath("server")[0]
-		ftp_url = server.get("url")
-		ftp_user = server.get("user")
-		ftp_path = server.get("path")
-		
-		ftp_password = keyring.get_password(ftp_url, ftp_user)
-		if ftp_password == None:
-			while 1:
-				print(application_name + " needs a password to continue. Please enter the password for")
-				print(" * service: ftp")
-				print(" * domain: " + ftp_url)
-				print(" * user: " + ftp_user)
-				print("to continue. Hint: To change the username and the domain, you have to edit cities.xml.")
-				ftp_password = getpass.getpass("Please enter the password:\n")
-				if ftp_password != "":
-					ftp_init=True
-					break
-				else:
-					print ("Authorization failed (no password entered).")
-			# store the password
-			if confirm("Do you want to securely store the password in the keyring of your operating system?",default=True):
-				keyring.set_password(ftp_url, ftp_user, ftp_password)
-				print("Password has been stored. You will not have to enter it again the next time.")
-
 def dot_storbinary(ftp, cmd, fp, blocksize=4*16384): #(8192) Extend storbinary to show a dot when a block was sent
 	ftp.voidcmd('TYPE I')
 	conn = ftp.transfercmd(cmd)
@@ -113,7 +91,7 @@ def dot_storbinary(ftp, cmd, fp, blocksize=4*16384): #(8192) Extend storbinary t
 	conn.close()
 	print ("")
 	return ftp.voidresp()
-	
+
 def upload_file(filename):
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path
 	
@@ -125,19 +103,19 @@ def upload_file(filename):
 		f = open("output/" + filename,'rb')
 		s.cwd(ftp_path)
 		dot_storbinary(s,'STOR ' + filename, f)
-		f.close()                                
+		f.close()
 		s.quit()
 	except: raise Exception("Uploading file '" + filename + "' failed.")
 	
 	print ("Uploading file '" + filename + "' finished.")
-	
+
 def file_exists(filename):
 	if os.path.isfile(filename):
 		filestats = os.stat(filename)
 		d = (datetime.now() - timedelta(4)).timetuple() #Keep file if not older than 5 days
-		if time.localtime(filestats[stat.ST_MTIME]) > d: 
+		if time.localtime(filestats[stat.ST_MTIME]) > d:
 			return True
-		else: 
+		else:
 			os.remove(filename)
 			return False
 	else:
@@ -154,7 +132,35 @@ def execute_cmd(action, cmd, ignore_error=False):
 		print(" FINISHED")
 	else:
 		print(" FAILED")
+
+def prepare_ftp():
+	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path, keyring_name
+	if ftp_init == False:
+		ftp_url = config["ftp"]["url"]
+		ftp_user = config["ftp"]["user"]
+		ftp_path = config["ftp"]["path"]
 		
+		ftp_password = keyring.get_password(ftp_url, ftp_user)
+		if ftp_password == None:
+			while 1:
+				print(application_name + " needs a password to continue. Please enter the password for")
+				print(" * service: ftp")
+				print(" * domain: " + ftp_url)
+				print(" * user: " + ftp_user)
+				print("to continue. Note: To change the username and the domain, you have to edit cities.xml.")
+				ftp_password = getpass.getpass("Please enter the password:\n")
+				if ftp_password != "":
+					ftp_init=True
+					break
+				else:
+					print ("Authorization failed (no password entered).")
+			# store the password
+			if confirm("Do you want to securely store the password in the keyring of your operating system?",default=True):
+				keyring.set_password(ftp_url, ftp_user, ftp_password)
+				print("Password has been stored. You will not have to enter it again the next time.")
+
+#==PROGRAM FUNCTIONS=================
+
 def update_city_state(id, state_type, message):
 	print ("Updating state of city '" + id + "' to '" + state_type + " (" + message + ")'...")
 	root = cities.getroot()

@@ -1,5 +1,7 @@
-"ftp": {
-	"url": "bitsteller.bplaced.net"
-	"user": "bitsteller",
-	"path": "osm/"
+{
+	"ftp": {
+		"url": "bitsteller.bplaced.net",
+		"user": "bitsteller",
+		"path": "osm/"
+	}
 }

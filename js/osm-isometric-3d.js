@@ -5,7 +5,7 @@
 var cities = {};
 var status = {};
 var map = null;
-var current_city_id = "";
+var current_city = null;
 var marker = null;
 
 var Modes = {
@@ -135,7 +135,6 @@ function hideMessage() {
 	}
 }
 
-
 /*-----------------------------------------*/
 /* for index.html                          */
 /*-----------------------------------------*/
@@ -231,8 +230,33 @@ function initIndex() {
 /* for map.html                            */
 /*-----------------------------------------*/
 
+function getCityById(city_id) {
+	var city = null;
+	for (var i = 0; i < this.cities.length; i++) {
+		city = this.cities[i];
+		if (city.city_id == city_id) {
+			return city;
+		}
+	}
+	return null;
+}
+
+function getCityByLatLon(lat,lon) {
+	var select=document.getElementById("city_select");
+	
+	var city = null;
+	for (var i = 0; i < this.cities.length; i++) {
+		city = this.cities[i];
+
+		if (city.area.bottom <= lat && lat <= city.area.top && city.area.left <= lon && lon <= city.area.right) {
+			return city;
+		}
+	}
+	return null;
+}
+
 function refreshState(repeat) {
-	var city_id = current_city_id;
+	var city_id = current_city_id; //TODO: not id
 	var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
 	if (city_name == "") {
 		document.getElementById("state").data = "Last update: unkown";
@@ -283,27 +307,6 @@ function refreshState(repeat) {
 	 }
 }
 
-function getCityByLatLon(lat,lon) {
-	loadCitiesXml();
-	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-	var select=document.getElementById("city_select");
-
-	var city = city_iterator.iterateNext();
-	while (city) {
-		var city_id = city.textContent;		
-		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		
-		if (area_bottom <= lat && lat <= area_top && area_left <= lon && lon <= area_right) {
-			return city_id;
-		}
-		city = city_iterator.iterateNext();
-	}
-	return "";
-}
-
 function loadPermalink() {
 	var center = map.getCenter();
 	var lat = tile2lat(lat2tile(center.lat,12)* 2.0,12);
@@ -318,19 +321,13 @@ function loadCity() {
     }
 	//set map center and zoom
 	 if (location.href.indexOf("#") != -1) {
-		loadCitiesXml();
 		var city_id = location.href.substr(location.href.indexOf("#")+1);
-		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		if (city_name != "") {
-			//get values from cities.xml
-			var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-			var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-			var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-			var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-			
-            var latlong = new L.LatLng(tile2lat(lat2tile((area_top+area_bottom)/2.0,12)/2.0,12), (area_left+area_right)/2.0); 
+		var city = getCityById(city_id);
+		 
+		if (city != null) {
+            var latlong = new L.LatLng(tile2lat(lat2tile((city.area.top+city.area.bottom)/2.0,12)/2.0,12), (city.area.left+city.area.right)/2.0);
             map.setView(latlong, 13);
-		   current_city_id = city_id;
+		    current_city = city;
 		}
 		else {
 			var location_str = location.href.substr(location.href.indexOf("#")+1);
@@ -350,12 +347,12 @@ function loadCity() {
                     map.addLayer(marker);
                 }
 
-				city_id = getCityByLatLon(lat,lon);
-				if (city_id == "") {
-                    var nearestCityId = getNearestCityId(new L.LatLng(lat,lon));
-                    if (nearestCityId != ""){
+				city = getCityByLatLon(lat,lon);
+				if (city == null) {
+                    var nearestCity = getNearestCityId(new L.LatLng(lat,lon));
+                    if (nearestCity != null){
                         var msg = "The position '" + location_str + "' is out of any rendered area. " + '<br/><br/>Try the following: <ul>';
-                        msg += '<li>Goto the nearest city: <a href="map.html#' + nearestCityId + '">' + getCityNameById(nearestCityId) + '</a>';
+                        msg += '<li>Goto the nearest city: <a href="map.html#' + nearestCity.city_id + '">' + nearestCity.name + '</a>';
                         msg += '<li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>';
                         showMessage("Sorry, but you're on a black spot!", msg);
                     }
@@ -367,25 +364,29 @@ function loadCity() {
 
                                  
 				}
-				current_city_id = city_id;
-				city_name = citiesXml.evaluate("//cities/city[@id='" + current_city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
+				current_city = city;
 			}
 			else {
 				showMessage("Error 404: Not found", "Sorry, but the city with the ID '" + location.href.substr(location.href.indexOf("#")+1) + "' was not found. " + '<br/><br/>Try the following: <ul><li>Check the URL</li> <li>Click <a href="index.html">here</a> to get a list of available cities</li></ul>');
 			}
-		}
-		//update page title and city list
-		document.title = "3D map of " + city_name;
-		 var select=document.getElementById("city_select");
-		 for (var i = 0; i < select.length; i++) {
-		 	if (select.options[i].value == city_id) {
-		 		select.options[i].selected = true;
-		 	}
-		 	else {
-		 		select.options[i].selected = false;
-		 	}
 		 }
-		 refreshState(false);
+		 if (city != null) {
+			 //update page title and city list
+			 document.title = "3D map of " + city.name;
+			 var select=document.getElementById("city_select");
+			 for (var i = 0; i < select.length; i++) {
+				 if (select.options[i].value == city_id) {
+					 select.options[i].selected = true;
+				 }
+				 else {
+					 select.options[i].selected = false;
+				 }
+			 }
+			 refreshState(false);
+		 }
+		 else {
+			 document.title = "3D map";
+		 }
 	 }
      else {
          map.locate({maxZoom:15, setView:true, enableHighAccuracy:true});
@@ -399,37 +400,19 @@ function selectedCity() {
 }
 
 function getNearestCityId(position) {
-    loadCitiesXml();
-	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-	var select=document.getElementById("city_select");
-    
-    var nearestCityId = "";
+    var nearestCity = null;
     var distance = 999999;
     
-	var city = city_iterator.iterateNext();
-	while (city) {
-        var city_id = city.textContent;
-		var area_left = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@left" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_top = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@top" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_right = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@right" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		var area_bottom = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/area/@bottom" , citiesXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
-		
-        var center = new L.LatLng(area_bottom + (area_top - area_bottom)/2.0, area_left + (area_right - area_left)/2.0);
+	var city = null;
+	for (var i = 0; i < this.cities.length; i++) {
+		city = this.cities[i];
+        var center = new L.LatLng(city.area.bottom + (city.area.top - city.area.bottom)/2.0, city.area.left + (city.area.right - city.area.left)/2.0);
         if (position.distanceTo(center) < distance) {
-            nearestCityId = city.textContent;
+            nearestCity = city;
             distance = position.distanceTo(center);
         }
-
-		city = city_iterator.iterateNext();
 	}
-	return nearestCityId;
-}
-
-function getCityNameById(city_id) {
-    loadCitiesXml();
-    var name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-
-	return name;
+	return nearestCity;
 }
 
 function locate() {
@@ -466,17 +449,14 @@ function initMap(){
     map.on('locationerror', locationfailed);
 
 
-	loadCitiesXml();
-	var city_iterator = citiesXml.evaluate("//cities/city/@id" , citiesXml, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+	loadCities();
+	
 	var select=document.getElementById("city_select");
-
-	var city = city_iterator.iterateNext();
-	while (city) {
-		var city_id = city.textContent;		
-		var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-		newOption = new Option(city_name, city_id);
+	var city = null;
+	for (var i = 0; i < this.cities.length; i++) {
+		city = this.cities[i];
+		newOption = new Option(city.name, city.city_id);
 		select.options[select.length] = newOption;
-		city = city_iterator.iterateNext();
 	}
 
 	loadCity();

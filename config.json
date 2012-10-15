@@ -1,8 +1,0 @@
-{
-	"version": 1,
-	"ftp": {
-		"url": "bitsteller.bplaced.net",
-		"user": "bitsteller",
-		"path": "osm/beta"
-	}
-}

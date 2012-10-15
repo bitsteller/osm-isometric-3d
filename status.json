@@ -34,13 +34,8 @@
       {
          "city_id": "uetze", 
          "status": {
-            "total_phases": 5, 
-            "total_steps": 4, 
-            "step": 4, 
-            "time": "1350307659379", 
-            "phase": 3, 
-            "type": "WORKING", 
-            "description": "Rendering"
+            "type": "READY", 
+            "time": 1350316557409
          }, 
          "stats": {
             "tiles": 4, 
@@ -76,6 +71,106 @@
                "start": "1350307480674", 
                "rendering_id": 5, 
                "succesful": false
+            }, 
+            {
+               "start": 1350310276440, 
+               "rendering_id": 6, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350310864840, 
+               "rendering_id": 7, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350310934040, 
+               "rendering_id": 8, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350310982038, 
+               "durations": [], 
+               "rendering_id": 9, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350311070809, 
+               "durations": [], 
+               "rendering_id": 10, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350311156266, 
+               "durations": [], 
+               "rendering_id": 11, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350311428992, 
+               "durations": [
+                  930, 
+                  48572, 
+                  282255
+               ], 
+               "rendering_id": 12, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350311969114, 
+               "durations": [
+                  2764, 
+                  33535, 
+                  274539, 
+                  8799
+               ], 
+               "rendering_id": 13, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350312393736, 
+               "durations": [
+                  991, 
+                  33411, 
+                  268745, 
+                  33842
+               ], 
+               "rendering_id": 14, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350312978340, 
+               "durations": [
+                  964, 
+                  32250, 
+                  246457, 
+                  18185
+               ], 
+               "rendering_id": 15, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350313778268, 
+               "durations": [
+                  840, 
+                  26829, 
+                  228506, 
+                  7869
+               ], 
+               "rendering_id": 16, 
+               "succesful": false
+            }, 
+            {
+               "start": 1350315505478, 
+               "durations": [
+                  1574, 
+                  39377, 
+                  305354, 
+                  9545, 
+                  696081
+               ], 
+               "end": 1350316557409, 
+               "rendering_id": 17, 
+               "succesful": true
             }
          ]
       }

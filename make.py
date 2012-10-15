@@ -27,6 +27,7 @@ DIR_OSM2POV = "osm2pov"
 application_name = "osm2pov-make"
 version_number = "0.3.1"
 
+current_phase = 0
 total_phases = 5
 
 #==GLOBALS=======================
@@ -42,6 +43,7 @@ ftp_password = ""
 ftp_path = ""
 
 rendering = {}
+last_status_time = 0
 
 city_id = ""
 
@@ -177,12 +179,15 @@ def getMinMaxTiles(city_id):
 #==STATUS FUNCTIONS=================
 
 def upload_status():
+	global last_status_time
+	
 	s = json.dumps(status, indent=3)
 	f = open("status.json", 'w')
 	f.write(s + "\n")
 	f.close()
 	execute_cmd("Moving status.json", "cp cities.json output/status.json")
 	upload_file("status.json")
+	last_status_time = int(time.time()*1000)
 
 def init_status(id):
 	global status
@@ -210,43 +215,54 @@ def init_status(id):
 	city["stats"]["total_tiles"] = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
 
 def status_start(id):
+	global rendering
 	city = getCityById(status["cities"], id)
 	rendering_id = 0
 	if len(city["renderings"]) > 0:
 		rendering_id = max([rendering["rendering_id"] for rendering in city["renderings"]]) + 1
 	rendering = { 	"rendering_id": rendering_id,
-					"start": str(int(time.time()*1000)),
-					"succesful": False }
+					"start": int(time.time()*1000),
+					"succesful": False,
+					"durations": [] }
 	city["renderings"].append(rendering)
 	upload_status()
 
 def status_end_phase(id, phase):
 	global rendering
 	city = getCityById(status["cities"], id)
-	rendering["durations"].append(int(time.time()*1000) - rendering["start"] - sum(renderings["duration"]))
+	rendering["durations"].append(int(time.time()*1000) - rendering["start"] - sum(rendering["durations"]))
 	if phase == total_phases:
-		rendering["end"] = str(int(time.time()*1000))
+		rendering["end"] = int(time.time()*1000)
 		rendering["succesful"] = True
 		city = getCityById(status["cities"], id)
-		city.status = { "time": str(int(time.time()*1000)),
+		city["status"] = { "time": int(time.time()*1000),
 						"type": "READY" }
 	upload_status()
 
 def status_progress(id, description, phase, step, total_steps):
+	global current_phase
+	
 	print("Status: " + description + " (" + str(step) + "/" + str(total_steps) + ")")
 	city = getCityById(status["cities"], id)
-	city["status"] = { "time": str(int(time.time()*1000)),
+	lasttime = 0
+	if city["status"]["time"] != None:
+		lasttime = city["status"]["time"]
+	city["status"] = { "time": int(time.time()*1000),
 					"type": "WORKING",
 					"description": description,
 					"phase": phase,
 					"total_phases": total_phases,
 					"step": step,
 					"total_steps": total_steps }
-	upload_status()
+	if phase > current_phase:
+		upload_status()
+	elif int(time.time()*1000) > last_status_time + 30*1000:
+		upload_status()
+	current_phase = phase
 
 def status_failed(id, description):
 	city = getCityById(status["cities"], id)
-	city.status = { "time": str(int(time.time()*1000)),
+	city.status = { "time": int(time.time()*1000),
 					"type": "FAILED",
 					"description": description }
 	upload_status()
@@ -268,11 +284,15 @@ def download_osm(source):
 def download_city(id):
 	city = [city for city in cities["cities"] if city["city_id"] == id][0]
 	
+	status_progress(id, "Downloading", 1, 1, 2)
 	source = city["source"]
 	download_osm(source) #Download .pbf
 
+	status_progress(id, "Downloading", 1, 2, 2)
 	filename = source.split("/")[-1]
 	trim_osm(filename, id, city["area"]["top"], city["area"]["left"], city["area"]["bottom"], city["area"]["right"]) #Trim and convert to .osm
+	status_end_phase(id, 1)
+
 
 # Trim a osm file
 def trim_osm(sourcefile, id, top, left, bottom, right):
@@ -318,6 +338,7 @@ def render_tiles(id):
 			povfile = id + "-" + str(x) + "_" + str(y) + ".pov"
 			status_progress(id, "Converting", 2, tilecount, numberoftiles)
 			execute_cmd("Converting " + povfile, COMMAND_OSM2POV + " " + osmfile + " " + povfile + " " + str(x) + " " + str(y))
+	status_end_phase(id, 2)
 
 	tilecount = 0
 	#render the tiles
@@ -331,7 +352,9 @@ def render_tiles(id):
 			os.remove(povfile)
 			if not(os.path.exists(tempdir + "/" + str(x))):
 				os.mkdir(tempdir + "/" + str(x))
-			execute_cmd("Moving output file of city '" + id + "':" + pngfile, "mv " + pngfile + " " + tempdir+"/"+str(x)+"/"+str(y)+".png")
+			execute_cmd("Moving output file of city '" + id + "': " + pngfile, "mv " + pngfile + " " + tempdir+"/"+str(x)+"/"+str(y)+".png")
+	status_end_phase(id, 3)
+
 
 def generate_tiles(id):
 	#make sure that tile dir exists
@@ -356,9 +379,7 @@ def generate_tiles(id):
 				for i in range(0, int(math.pow(2,zoom-12))):
 					for j in range(0, int(math.pow(2,zoom-12))):
 						tilecount += 1
-						if (tilecount % 34 == 0):
-							tileinfo = "tile " + str(tilecount) + "/" + str(numberoftiles)
-							update_city_state(id, "WORKING", "Scaling and cutting, " + tileinfo + "...")
+						status_progress(id, "Cutting tiles", 4, tilecount, numberoftiles)
 						tile_x = int(x*math.pow(2,zoom-12)) + i
 						tile_y = int(y*math.pow(2,zoom-12)) + j
 						
@@ -372,6 +393,7 @@ def generate_tiles(id):
 						region = im.crop(box)
 						region.thumbnail(size)
 						region.save(tiledir + "/" + str(zoom) + "/" + str(tile_x) + "/" + str(tile_y) + ".png", "PNG")
+	status_end_phase(id, 4)
 
 def upload_tiles(id):
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path
@@ -404,11 +426,8 @@ def upload_tiles(id):
 					for j in range(0, int(math.pow(2,zoom-12))):
 						tilecount += 1
 						tile_y = int(y*math.pow(2,zoom-12)) + j
+						status_progress(id, "Uploading", 5, tilecount, numberoftiles)
 						print("Uploading tile (zoom=" + str(zoom) + ", x=" + str(tile_x) + ", y=" + str(tile_y) + ")...")
-						if (tilecount % 34 == 0):
-							tileinfo = "tile " + str(tilecount) + "/" + str(numberoftiles)
-							update_city_state(id, "WORKING", "Uploading, " + tileinfo + "...")
-						
 						try:	
 							f = open("output/tiles/" + str(zoom) + "/" + str(tile_x) + "/" + str(tile_y) + ".png",'rb')
 							dot_storbinary(s,'STOR ' + str(tile_y) + ".png", f)
@@ -419,6 +438,7 @@ def upload_tiles(id):
 					s.cwd("..")
 		s.cwd("..")                           
 	s.quit()
+	status_end_phase(id, 5)
 
 def tweet_finished(id):
 	city = [city for city in cities["cities"] if city["city_id"] == id][0]

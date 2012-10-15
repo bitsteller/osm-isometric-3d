@@ -185,7 +185,7 @@ def upload_status():
 	f = open("status.json", 'w')
 	f.write(s + "\n")
 	f.close()
-	execute_cmd("Moving status.json", "cp cities.json output/status.json")
+	execute_cmd("Moving status.json", "cp status.json output/status.json")
 	upload_file("status.json")
 	last_status_time = int(time.time()*1000)
 

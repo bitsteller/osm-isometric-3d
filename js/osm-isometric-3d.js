@@ -3,7 +3,6 @@
 /*-----------------------------------------*/
 
 var cities = {};
-var status = {};
 var map = null;
 var current_city = null;
 var marker = null;
@@ -58,12 +57,12 @@ function loadStatus() {
 	http_request.onreadystatechange = function () {
 		var done = 4, ok = 200;
 		if (http_request.readyState == done && http_request.status == ok) {
-			status = JSON.parse(http_request.responseText);
+			var cities_status = JSON.parse(http_request.responseText)["cities"];
 			if (mode == Modes.INDEX) {
-				refreshCityTable();
+				refreshCityTable(cities_status);
 			}
 			else if (mode == Modes.MAP) {
-				refreshState();
+				refreshState(cities_status);
 			}
 		}
 	};
@@ -135,11 +134,22 @@ function hideMessage() {
 	}
 }
 
+function getStatusByCityId(cities_status, id) {
+	for (var i = 0; i < cities_status.length; i++) {
+		var status = cities_status[i];
+		if (status.city_id == id) {
+			return status;
+		}
+	}
+	return null;
+}
+
+
 /*-----------------------------------------*/
 /* for index.html                          */
 /*-----------------------------------------*/
 
-function refreshCityTable() {  	
+function refreshCityTable(cities_status) {
   	//clear table
  	var table = document.getElementById("city_list").getElementsByTagName("tbody")[0];
 	while (table.firstElementChild) {
@@ -150,43 +160,48 @@ function refreshCityTable() {
 	var city = null;
 	for (var i = 0; i<this.cities.length; i++) {
 		city = this.cities[i];
-		alert(city.city_id);
-		var city_id = city.textContent;		
-		var city_name = city.name;
-		var stats_last_rendering_finished = "TODO"; //TODO: Missing values
-		var state_date = "TODO";
-		var state_type = "TODO";
-		var state_message = "TODO"
-		var area_left = city.area.left;
-		var area_top = city.area.top;
-		var area_right = city.area.right;
-		var area_bottom = city.area.bottom;
-
+		var status = getStatusByCityId(cities_status, city.city_id);
 		 var row = document.createElement("tr");
+		//Thumbnail
 		 var cell0 = document.createElement("td");
 		 var image = document.createElement("img");
-		 image.setAttribute("src", "tiles/14/" + Math.round(long2tile((area_left+area_right)/2.0,14)) + "/" + Math.round(lat2tile((area_top+area_bottom)/2.0,14)/2.0) + ".png");
+		 image.setAttribute("src", "tiles/14/" + Math.round(long2tile((city.area.left + city.area.right)/2.0,14)) + "/" + Math.round(lat2tile((city.area.top + city.area.bottom)/2.0,14)/2.0) + ".png");
 		 image.setAttribute("class", "thumbnail");
 		 cell0.appendChild(image);
-		 
+		
+		//Name and link
 		 var cell1 = document.createElement("td");
 		 var link = document.createElement("a");
-		 link.setAttribute("href", "map.html#" + city_id);
-		 link.innerHTML = city_name;
+		 link.setAttribute("href", "map.html#" + city.city_id);
+		 link.innerHTML = city.name;
 		 cell1.appendChild(link);
+		
+		//Last update
+		var last_rendering_finished = 0;
+		for (var j = 0; j < status.renderings.length; j++) {
+			var rendering = status.renderings[j];
+			if (rendering.succesful && rendering.end > last_rendering_finished) {
+				last_rendering_finished = rendering.end;
+			}
+		}
 		 var cell2 = document.createElement("td");
-		 if (stats_last_rendering_finished == "") {
+		 if (last_rendering_finished == 0) {
 		 	cell2.innerHTML = "n/a";
 		 }
 		 else {
 		 	try {
-		 		var date = new Date(parseInt(stats_last_rendering_finished));
+		 		var date = new Date(parseInt(last_rendering_finished));
 		 		cell2.innerHTML = getHumanReadableDate(date);
 		 	}
 		 	catch (err) {
-		 		cell2.innerHTML = stats_last_rendering_finished;
+		 		cell2.innerHTML = last_rendering_finished;
 		 	}
 		 }
+		
+		//Status
+		var state_date = "TODO";
+		var state_type = "TODO";
+		var state_message = "TODO";
 		 var cell3 = document.createElement("td");
 		 if (state_type == "READY") {
 		 	cell3.innerHTML = "";
@@ -199,7 +214,15 @@ function refreshCityTable() {
 		 	cell3.innerHTML += state_message;
 		 	try {
 		 		var date_state = new Date(parseInt(state_date));
-		 		cell3.innerHTML += '<br/><div class="timestamp">' + getHumanReadableDate(date_state) + "</div>";
+				var date_state_hr = ""
+				try {
+					var date = new Date(parseInt(last_rendering_finished));
+					date_state_hr = getHumanReadableDate(date);
+				}
+				catch (err) {
+					date_state_hr = last_rendering_finished;
+				}
+		 		cell3.innerHTML += '<br/><div class="timestamp">' + date_state_hr + "</div>";
 		 	}
 		 	catch (err) {
 				

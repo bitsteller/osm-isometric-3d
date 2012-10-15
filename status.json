@@ -1,33 +1,83 @@
 {
-	"version": 1,
-	"cities": [
-			   {
-			   "city_id": "b",
-			   "stats": {
-			   "tiles": 4,
-			   "total_tiles": 340
-			   },
-			   "status": {
-			   "time": 1349516799205,
-			   "type": "READY",
-			   "message": "Rendering finished",
-			   "phase": 5,
-			   "total_phases":5,
-			   "step": 100,
-			   "total_steps":100
-			   },
-			   "renderings": [
-							  {
-							  "rendering_id": 1,
-							  "start": 1349515107378,
-							  "end": 1349516799205,
-							  "duration_preparation": 134951,
-							  "duration_render": 1349518,
-							  "duration_cutting": 134951,
-							  "duration_upload": 1349515,
-							  "succesful":true
-							  }
-							  ]
-			   }
-			   ]
+   "version": 1, 
+   "cities": [
+      {
+         "city_id": "b", 
+         "status": {
+            "total_phases": 5, 
+            "description": "Rendering finished", 
+            "step": 100, 
+            "time": 1349516799205, 
+            "phase": 5, 
+            "type": "READY", 
+            "total_steps": 100
+         }, 
+         "stats": {
+            "tiles": 4, 
+            "total_tiles": 340
+         }, 
+         "renderings": [
+            {
+               "start": 1349515107378, 
+               "durations": [
+                  134951, 
+                  1349518, 
+                  134951, 
+                  1349515
+               ], 
+               "end": 1349516799205, 
+               "succesful": true, 
+               "rendering_id": 1
+            }
+         ]
+      }, 
+      {
+         "city_id": "uetze", 
+         "status": {
+            "total_phases": 5, 
+            "total_steps": 4, 
+            "step": 4, 
+            "time": "1350307659379", 
+            "phase": 3, 
+            "type": "WORKING", 
+            "description": "Rendering"
+         }, 
+         "stats": {
+            "tiles": 4, 
+            "total_tiles": 340
+         }, 
+         "renderings": [
+            {
+               "start": "1350301863340", 
+               "rendering_id": 0, 
+               "succesful": false
+            }, 
+            {
+               "start": "1350307127394", 
+               "rendering_id": 1, 
+               "succesful": false
+            }, 
+            {
+               "start": "1350307159105", 
+               "rendering_id": 2, 
+               "succesful": false
+            }, 
+            {
+               "start": "1350307296080", 
+               "rendering_id": 3, 
+               "succesful": false
+            }, 
+            {
+               "start": "1350307332316", 
+               "rendering_id": 4, 
+               "succesful": false
+            }, 
+            {
+               "start": "1350307480674", 
+               "rendering_id": 5, 
+               "succesful": false
+            }
+         ]
+      }
+   ]
 }

@@ -27,6 +27,8 @@ DIR_OSM2POV = "osm2pov"
 application_name = "osm2pov-make"
 version_number = "0.3.1"
 
+total_phases = 5
+
 #==GLOBALS=======================
 
 config = json.loads(open("config.json").read())
@@ -39,11 +41,9 @@ ftp_url = ""
 ftp_password = ""
 ftp_path = ""
 
+rendering = {}
+
 city_id = ""
-
-date_start = ""
-date_end = ""
-
 
 #==COMMON FUNCTIONS==============
 
@@ -174,81 +174,89 @@ def getMinMaxTiles(city_id):
 	maxtile_y = int(math.ceil((maxtile_y/2)))
 	return (mintile_x, maxtile_x, mintile_y, maxtile_y)
 
-#==PROGRAM FUNCTIONS=================
+#==STATUS FUNCTIONS=================
 
-def update_city_state(id, state_type, message):
-	print ("Updating state of city '" + id + "' to '" + state_type + " (" + message + ")'...")
-#	root = cities.getroot()
-#	city = root.xpath("city[@id='" + id + "']")[0]
-#	
-#	if (len(city.xpath("state")) == 0):
-#		etree.SubElement(city, "state")
-#	state = city.xpath("state")[0]
-#	
-#	#Update state data
-#	state_date = str(int(time.time()*1000))
-#	state.set("date", state_date)
-#	state.set("type",state_type)
-#	state.set("message",message)
-#	
-#	print("Writing cities.xml...")
-#	cities.write("cities.xml")
-#
-#	if not(os.path.exists("output")):
-#		os.mkdir("output")
-#	
-#	execute_cmd("Moving cities.xml", "cp cities.xml output/cities.xml")
-#	upload_file("cities.xml")
+def upload_status():
+	s = json.dumps(status, indent=3)
+	f = open("status.json", 'w')
+	f.write(s + "\n")
+	f.close()
+	execute_cmd("Moving status.json", "cp cities.json output/status.json")
+	upload_file("status.json")
 
-def update_city_stats(id):
+def init_status(id):
+	global status
+	#upload cities.json
 	execute_cmd("Moving cities.json", "cp cities.json output/cities.json")
 	upload_file("cities.json")
 	
+	#init status.json for the city
 	if os.path.isfile("status.json"):
 		status = json.loads(open("status.json").read())
 		if status["version"] != 1:
 			raise IOException("Version of status.json is not compatible. Must be 1.")
 	else:
 		status = {"version": 1, "cities": []}
-
+	
 	city = getCityById(status["cities"], id)
-
+	
 	if city == None:
-		city = {"city_id": id, "stats": dict(), "status": dict(), "renderings": []}
+		city = {"city_id": id, "stats": dict(), "status": {"type": "READY"}, "renderings": []}
 		status["cities"].append(city)
-
+	
 	mintile_x, maxtile_x, mintile_y, maxtile_y = getMinMaxTiles(id)
 	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1))
 	city["stats"]["tiles"] = numberoftiles
 	city["stats"]["total_tiles"] = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
 
-	print(status["cities"]) #TODO: continue
-#
-#	print("Updating stats of city '" + id + "'...")
-#	root = cities.getroot()
-#	city = root.xpath("city[@id='" + id + "']")[0]
-#	
-#	#Update statistics
-#	if (len(city.xpath("stats")) == 0):
-#		etree.SubElement(city, "stats")
-#	stats = city.xpath("stats")[0]
-#
-#	area = root.xpath("city[@id='" + id + "']/area")[0]
-#	mintile_x, mintile_y = deg2tile(float(area.get("top")),float(area.get("left")),12)
-#	maxtile_x, maxtile_y = deg2tile(float(area.get("bottom")),float(area.get("right")),12)
-#	mintile_y = int(math.floor((mintile_y/2)))
-#	maxtile_y = int(math.ceil((maxtile_y/2)))
-#	
-#	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1))
-#	totalnumberoftiles = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
-#	
-#	stats.set("tiles", str(numberoftiles))
-#	stats.set("total-tiles",str(totalnumberoftiles))
-#	stats.set("last-rendering-start",date_start)
-#	stats.set("last-rendering-finished",date_end)
-#	
-#	print("Writing cities.xml...")
-#	cities.write("cities.xml")
+def status_start(id):
+	city = getCityById(status["cities"], id)
+	rendering_id = 0
+	if len(city["renderings"]) > 0:
+		rendering_id = max([rendering["rendering_id"] for rendering in city["renderings"]]) + 1
+	rendering = { 	"rendering_id": rendering_id,
+					"start": str(int(time.time()*1000)),
+					"succesful": False }
+	city["renderings"].append(rendering)
+	upload_status()
+
+def status_end_phase(id, phase):
+	global rendering
+	city = getCityById(status["cities"], id)
+	rendering["durations"].append(int(time.time()*1000) - rendering["start"] - sum(renderings["duration"]))
+	if phase == total_phases:
+		rendering["end"] = str(int(time.time()*1000))
+		rendering["succesful"] = True
+		city = getCityById(status["cities"], id)
+		city.status = { "time": str(int(time.time()*1000)),
+						"type": "READY" }
+	upload_status()
+
+def status_progress(id, description, phase, step, total_steps):
+	print("Status: " + description + " (" + str(step) + "/" + str(total_steps) + ")")
+	city = getCityById(status["cities"], id)
+	city["status"] = { "time": str(int(time.time()*1000)),
+					"type": "WORKING",
+					"description": description,
+					"phase": phase,
+					"total_phases": total_phases,
+					"step": step,
+					"total_steps": total_steps }
+	upload_status()
+
+def status_failed(id, description):
+	city = getCityById(status["cities"], id)
+	city.status = { "time": str(int(time.time()*1000)),
+					"type": "FAILED",
+					"description": description }
+	upload_status()
+
+def status_cleanup():
+	print("cleanup") #TODO: cleanup old renderings etc. from status.json
+	upload_status()
+
+
+#==PROGRAM FUNCTIONS=================
 
 # Download a osm file
 def download_osm(source):
@@ -302,21 +310,28 @@ def render_tiles(id):
 	numberoftiles = (maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1)
 	tilecount = 0
 	
-	#render the tiles
+	#convert the tiles to .pov
 	osmfile = id + ".osm"
 	for x in range(mintile_x, maxtile_x + 1):
 		for y in range(mintile_y, maxtile_y + 1):
 			tilecount += 1
 			povfile = id + "-" + str(x) + "_" + str(y) + ".pov"
+			status_progress(id, "Converting", 2, tilecount, numberoftiles)
+			execute_cmd("Converting " + povfile, COMMAND_OSM2POV + " " + osmfile + " " + povfile + " " + str(x) + " " + str(y))
+
+	tilecount = 0
+	#render the tiles
+	for x in range(mintile_x, maxtile_x + 1):
+		for y in range(mintile_y, maxtile_y + 1):
+			tilecount += 1
+			povfile = id + "-" + str(x) + "_" + str(y) + ".pov"
 			pngfile = id + "-" + str(x) + "_" + str(y) + ".png"
-			tileinfo = "tile " + str(tilecount) + "/" + str(numberoftiles)
-			update_city_state(id, "WORKING", "Rendering " + tileinfo + "...")
-			execute_cmd("Generating pov file for city '" + id + "', " + tileinfo, COMMAND_OSM2POV + " " + osmfile + " " + povfile + " " + str(x) + " " + str(y))
-			execute_cmd("Rendering city '" + id + "', " + tileinfo, COMMAND_POVRAY + " +W2048 +H2048 +B100 -D +A " + povfile)
+			status_progress(id, "Rendering", 3, tilecount, numberoftiles)
+			execute_cmd("Rendering " + pngfile, COMMAND_POVRAY + " +W2048 +H2048 +B100 -D +A " + povfile)
 			os.remove(povfile)
 			if not(os.path.exists(tempdir + "/" + str(x))):
 				os.mkdir(tempdir + "/" + str(x))
-			execute_cmd("Moving output file of city '" + id + "'" + tileinfo, "mv " + pngfile + " " + tempdir+"/"+str(x)+"/"+str(y)+".png")
+			execute_cmd("Moving output file of city '" + id + "':" + pngfile, "mv " + pngfile + " " + tempdir+"/"+str(x)+"/"+str(y)+".png")
 
 def generate_tiles(id):
 	#make sure that tile dir exists
@@ -409,27 +424,16 @@ def tweet_finished(id):
 	city = [city for city in cities["cities"] if city["city_id"] == id][0]
 	if OPTION_ENABLE_TWITTER:
 		execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city["name"] + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
-	
+								
+#main update method
 def update_city(id):
-	global date_start, date_end
-	
-	date_start = str(int(time.time()*1000))
-	update_city_stats(id)
-	update_city_state(id, "WORKING", "Preparing rendering...")
+	status_start(id)
 	download_city(id)
-	update_city_state(id, "WORKING", "Rendering city...")
 	render_tiles(id)
-	update_city_state(id, "WORKING", "Cutting and scaling..")
 	generate_tiles(id)
-	update_city_state(id, "WORKING", "Uploading...")
 	upload_tiles(id)
-#	update_city_state(id, "WORKING", "Updating statistics...")
-#	date_end = str(int(time.time()*1000))
-#	update_city_stats(id)
-	update_city_state(id, "WORKING", "Tweeting state...")
 	tweet_finished(id)
-	update_city_state(id, "READY", "")
-
+								
 def getNumberOfTiles(top,left,bottom,right):
 	#compute tile numbers to render
 	mintile_x, mintile_y = deg2tile(float(top),float(left),12)
@@ -514,8 +518,9 @@ if len(sys.argv)>1:
 		prepare_ftp(True) #change password
 	elif len(sys.argv)>2:
 		city_id = sys.argv[2]
-		if action=="post" and len(sys.argv)==5:
-			update_city_state(city_id, sys.argv[3], sys.argv[4])
+		init_status(city_id)
+		if action=="post" and len(sys.argv)==4:
+			status_failed(city_id, sys.argv[3])
 		elif action=="update" and len(sys.argv)==3:
 			update_city(city_id)
 		elif action=="render" and len(sys.argv)==3:
@@ -524,13 +529,13 @@ if len(sys.argv)>1:
 			generate_tiles(city_id)
 		elif action=="upload" and len(sys.argv)==3:
 			upload_tiles(city_id)
-			update_city_state(city_id, "READY", "")
 		elif action=="download" and len(sys.argv)==3:
 			download_city(city_id)
 		elif action=="expand" and len(sys.argv)==3:
 			expand_city(city_id)
 		else:
 			print("FAILED: Wrong number of arguments for action or unkown action")
+		status_cleanup()
 	else:
 		print("FAILED: Wrong number of arguments for action or unkown action")
 else:

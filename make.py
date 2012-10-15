@@ -31,7 +31,7 @@ version_number = "0.3.1"
 
 config = json.loads(open("config.json").read())
 cities = json.loads(open("cities.json").read())
-#status = json.loads(open("status.json").read())      TODO: remove
+status = {}
 
 ftp_init = False
 ftp_user = ""
@@ -159,6 +159,21 @@ def prepare_ftp(force_password=False):
 				keyring.set_password(ftp_url, ftp_user, ftp_password)
 				print("Password has been stored. You will not have to enter it again the next time.")
 
+def getCityById(array, city_id):
+	filter = [city for city in array if city["city_id"] == city_id]
+	if len(filter) > 0:
+		return filter[0]
+	else:
+		return None
+
+def getMinMaxTiles(city_id):
+	city = [city for city in cities["cities"] if city["city_id"] == city_id][0]
+	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
+	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
+	mintile_y = int(math.floor((mintile_y/2)))
+	maxtile_y = int(math.ceil((maxtile_y/2)))
+	return (mintile_x, maxtile_x, mintile_y, maxtile_y)
+
 #==PROGRAM FUNCTIONS=================
 
 def update_city_state(id, state_type, message):
@@ -186,11 +201,29 @@ def update_city_state(id, state_type, message):
 #	upload_file("cities.xml")
 
 def update_city_stats(id):
-	global date_start, date_end
-
 	execute_cmd("Moving cities.json", "cp cities.json output/cities.json")
 	upload_file("cities.json")
-#	
+	
+	if os.path.isfile("status.json"):
+		status = json.loads(open("status.json").read())
+		if status["version"] != 1:
+			raise IOException("Version of status.json is not compatible. Must be 1.")
+	else:
+		status = {"version": 1, "cities": []}
+
+	city = getCityById(status["cities"], id)
+
+	if city == None:
+		city = {"city_id": id, "stats": dict(), "status": dict(), "renderings": []}
+		status["cities"].append(city)
+
+	mintile_x, maxtile_x, mintile_y, maxtile_y = getMinMaxTiles(id)
+	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1))
+	city["stats"]["tiles"] = numberoftiles
+	city["stats"]["total_tiles"] = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
+
+	print(status["cities"]) #TODO: continue
+#
 #	print("Updating stats of city '" + id + "'...")
 #	root = cities.getroot()
 #	city = root.xpath("city[@id='" + id + "']")[0]
@@ -199,7 +232,7 @@ def update_city_stats(id):
 #	if (len(city.xpath("stats")) == 0):
 #		etree.SubElement(city, "stats")
 #	stats = city.xpath("stats")[0]
-#	
+#
 #	area = root.xpath("city[@id='" + id + "']/area")[0]
 #	mintile_x, mintile_y = deg2tile(float(area.get("top")),float(area.get("left")),12)
 #	maxtile_x, maxtile_y = deg2tile(float(area.get("bottom")),float(area.get("right")),12)
@@ -265,12 +298,7 @@ def render_tiles(id):
 
 	
 	#compute tile numbers to render
-	area = [city for city in cities["cities"] if city["city_id"] == id][0]["area"]
-	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
-	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
-	mintile_y = int(math.floor((mintile_y/2)))
-	maxtile_y = int(math.ceil((maxtile_y/2)))
-	
+	mintile_x, maxtile_x, mintile_y, maxtile_y = getMinMaxTiles(id)
 	numberoftiles = (maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1)
 	tilecount = 0
 	
@@ -297,12 +325,7 @@ def generate_tiles(id):
 	tiledir = "output/tiles"
 	
 	#compute tile numbers rendered
-	city = [city for city in cities["cities"] if city["city_id"] == id][0]
-	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
-	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
-	mintile_y = int(math.floor((mintile_y/2)))
-	maxtile_y = int(math.ceil((maxtile_y/2)))
-	
+	mintile_x, maxtile_x, mintile_y, maxtile_y = getMinMaxTiles(id)
 	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1)) * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
 	tilecount = 0
 	
@@ -339,12 +362,7 @@ def upload_tiles(id):
 	global ftp_url, ftp_user, ftp_password, ftp_init, ftp_path
 	
 	#compute tile numbers rendered
-	city = [city for city in cities["cities"] if city["city_id"] == id][0]
-	mintile_x, mintile_y = deg2tile(city["area"]["top"],city["area"]["left"],12)
-	maxtile_x, maxtile_y = deg2tile(city["area"]["bottom"],city["area"]["right"],12)
-	mintile_y = int(math.floor((mintile_y/2)))
-	maxtile_y = int(math.ceil((maxtile_y/2)))
-	
+	mintile_x, maxtile_x, mintile_y, maxtile_y = getMinMaxTiles(id)
 	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1)) * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
 	tilecount = 0
 	
@@ -396,6 +414,7 @@ def update_city(id):
 	global date_start, date_end
 	
 	date_start = str(int(time.time()*1000))
+	update_city_stats(id)
 	update_city_state(id, "WORKING", "Preparing rendering...")
 	download_city(id)
 	update_city_state(id, "WORKING", "Rendering city...")
@@ -404,9 +423,9 @@ def update_city(id):
 	generate_tiles(id)
 	update_city_state(id, "WORKING", "Uploading...")
 	upload_tiles(id)
-	update_city_state(id, "WORKING", "Updating statistics...")
-	date_end = str(int(time.time()*1000))
-	update_city_stats(id)
+#	update_city_state(id, "WORKING", "Updating statistics...")
+#	date_end = str(int(time.time()*1000))
+#	update_city_stats(id)
 	update_city_state(id, "WORKING", "Tweeting state...")
 	tweet_finished(id)
 	update_city_state(id, "READY", "")
@@ -454,11 +473,11 @@ def expand_city(id):
 	print("Suggested:")
 	print(' top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
 
-	if confirm("Do you want to overwrite the old bounds with the suggested ones?",default=False):
-		city["area"]["top"] =str(top)
-		city["area"]["left"] =str(left)
-		city["area"]["bottom"] =str(bottom)
-		city["area"]["right"] =str(right)
+	if confirm("Do you want to overwrite the old bounds with the suggested ones?", default=False):
+		city["area"]["top"] = str(top)
+		city["area"]["left"] = str(left)
+		city["area"]["bottom"] = str(bottom)
+		city["area"]["right"] = str(right)
 
 		s = json.dumps(cities, indent=3)
 				

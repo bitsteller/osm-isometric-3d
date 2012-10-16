@@ -160,7 +160,6 @@ function refreshCityTable(cities_status) {
 	var city = null;
 	for (var i = 0; i<this.cities.length; i++) {
 		city = this.cities[i];
-		var status = getStatusByCityId(cities_status, city.city_id);
 		 var row = document.createElement("tr");
 		//Thumbnail
 		 var cell0 = document.createElement("td");
@@ -177,13 +176,22 @@ function refreshCityTable(cities_status) {
 		 cell1.appendChild(link);
 		
 		//Last update
+		var status = getStatusByCityId(cities_status, city.city_id);
+		
 		var last_rendering_finished = 0;
-		for (var j = 0; j < status.renderings.length; j++) {
-			var rendering = status.renderings[j];
-			if (rendering.succesful && rendering.end > last_rendering_finished) {
-				last_rendering_finished = rendering.end;
+		if (status != null) {
+			var max_id = 0;
+			for (var j = 0; j < status.renderings.length; j++) {
+				var rendering = status.renderings[j];
+				if (rendering.rendering_id > max_id) {
+					max_id = rendering.rendering_id
+					if (rendering.succesful) {
+						last_rendering_finished = rendering.end;
+					}
+				}
 			}
 		}
+
 		 var cell2 = document.createElement("td");
 		 if (last_rendering_finished == 0) {
 		 	cell2.innerHTML = "n/a";
@@ -199,35 +207,59 @@ function refreshCityTable(cities_status) {
 		 }
 		
 		//Status
-		var state_date = "TODO";
-		var state_type = "TODO";
-		var state_message = "TODO";
 		 var cell3 = document.createElement("td");
-		 if (state_type == "READY") {
-		 	cell3.innerHTML = "";
-		 }
-		 else {
-		 	if (state_type =="WORKING") {
-		 		working=true;
-		 	}
-		 	
-		 	cell3.innerHTML += state_message;
-		 	try {
-		 		var date_state = new Date(parseInt(state_date));
-				var date_state_hr = ""
+		//cell3.title="test";
+		if (status != null) {
+			if (status.status.type == "READY") {
+				cell3.innerHTML = "";
+			}
+			else {
+				if (status.status.type =="WORKING") {
+					working=true;
+				}
+				var canvas = document.createElement("canvas");
+				canvas.style.paddingRight = 3;
+				canvas.width = 14;
+				canvas.height = 14;
+				canvas.title = status.status.step + "/" + status.status.total_steps;
+				var context = canvas.getContext("2d");
+				context.fillStyle = "rgb(80,80,80)";
+				context.beginPath();
+				context.moveTo(7,7);
+				var endAngle = 1.0*status.status.step/status.status.total_steps*2.0*Math.PI - 0.5*Math.PI;
+				context.arc(7, 7, 6, -0.5*Math.PI, endAngle, false);
+				context.fill();
+				context.strokeStyle = "rgb(150,150,150)";
+				context.beginPath();
+				context.arc(7, 7, 6, 0.0, 2.0*Math.PI, false);
+				context.stroke();
+
+				cell3.appendChild(canvas);
+				
+				cell3.appendChild(document.createTextNode(status.status.description));
+				cell3.appendChild(document.createElement("br"));
+								  
+				var date_state_hr = "n/a";
 				try {
-					var date = new Date(parseInt(last_rendering_finished));
-					date_state_hr = getHumanReadableDate(date);
+					var date_state = new Date(parseInt(status.status.time));
+					try {
+						date_state_hr = getHumanReadableDate(date_state);
+					}
+					catch (err) {
+						date_state_hr = last_rendering_finished;
+					}
 				}
 				catch (err) {
-					date_state_hr = last_rendering_finished;
+					
 				}
-		 		cell3.innerHTML += '<br/><div class="timestamp">' + date_state_hr + "</div>";
-		 	}
-		 	catch (err) {
-				
-		 	}
-		 }
+				var timestamp = document.createElement("div");
+				timestamp.className = "timestamp";
+				timestamp.innerHTML = date_state_hr;
+
+				cell3.appendChild(timestamp);
+			}
+		}
+
 		 row.appendChild(cell0);
 		 row.appendChild(cell1);
 		 row.appendChild(cell2);

@@ -225,7 +225,7 @@ function getFailedStatusDiv(status) {
 function getLastRenderingFinishedTime(status) {
 	var last_rendering_finished = 0;
 	if (status != null) {
-		var max_id = 0;
+		var max_id = -1;
 		for (var j = 0; j < status.renderings.length; j++) {
 			var rendering = status.renderings[j];
 			if (rendering.rendering_id > max_id) {
@@ -279,13 +279,8 @@ function refreshCityTable(cities_status) {
 		 	cell2.innerHTML = "n/a";
 		 }
 		 else {
-		 	try {
-		 		var date = new Date(parseInt(last_rendering_finished));
-		 		cell2.innerHTML = getHumanReadableDate(date);
-		 	}
-		 	catch (err) {
-		 		cell2.innerHTML = last_rendering_finished;
-		 	}
+			var date = new Date(last_rendering_finished);
+			cell2.innerHTML = getHumanReadableDate(date);
 		 }
 		
 		//Status
@@ -361,9 +356,14 @@ function refreshState(cities_status) {
 		stateDiv.appendChild(getWorkingStatusDiv(status));
 	}
 	 else {
-		 this.working = false;
-	 	var lastUpdateStr = "Last update: " + getHumanReadableDate(new Date(last_rendering_finished));
-		stateDiv.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
+		 this.working = false;		 
+		 if (last_rendering_finished == 0) {
+			 stateDiv.innerHTML = "Last update: n/a";
+		 }
+		 else {
+			 var lastUpdateStr = "Last update: " + getHumanReadableDate(new Date(last_rendering_finished));
+			 stateDiv.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
+		 }
 	 }
 }
 

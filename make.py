@@ -245,7 +245,7 @@ def status_progress(id, description, phase, step, total_steps):
 	print("Status: " + description + " (" + str(step) + "/" + str(total_steps) + ")")
 	city = getCityById(status["cities"], id)
 	lasttime = 0
-	if city["status"]["time"] != None:
+	if "time" in city["status"]:
 		lasttime = city["status"]["time"]
 	city["status"] = { "time": int(time.time()*1000),
 					"type": "WORKING",

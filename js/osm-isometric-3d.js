@@ -6,6 +6,7 @@ var cities = {};
 var map = null;
 var current_city = null;
 var marker = null;
+var working = false;
 
 var Modes = {
 	INDEX: 0,
@@ -51,7 +52,7 @@ function loadCities() {
 	cities = JSON.parse(req.responseText)["cities"];
 }
 
-function loadStatus() {
+function loadStatus(repeat) {
 	var http_request = new XMLHttpRequest();
 	http_request.open("GET", "status.json", true);
 	http_request.onreadystatechange = function () {
@@ -63,6 +64,12 @@ function loadStatus() {
 			}
 			else if (mode == Modes.MAP) {
 				refreshState(cities_status);
+			}
+			if (this.working == true && repeat) {
+				setTimeout("loadStatus(true)",5000); //reload every 5 secs
+			}
+			else {
+				setTimeout("loadStatus(true)",60000); //reload every minute
 			}
 		}
 	};
@@ -215,6 +222,24 @@ function getFailedStatusDiv(status) {
 	return div;
 }
 
+function getLastRenderingFinishedTime(status) {
+	var last_rendering_finished = 0;
+	if (status != null) {
+		var max_id = 0;
+		for (var j = 0; j < status.renderings.length; j++) {
+			var rendering = status.renderings[j];
+			if (rendering.rendering_id > max_id) {
+				max_id = rendering.rendering_id
+				if (rendering.succesful) {
+					last_rendering_finished = rendering.end;
+				}
+			}
+		}
+	}
+	return last_rendering_finished;
+}
+
+
 
 /*-----------------------------------------*/
 /* for index.html                          */
@@ -227,7 +252,6 @@ function refreshCityTable(cities_status) {
  		table.removeChild(table.firstElementChild);
 	}
  	
- 	var working = false;
 	var city = null;
 	for (var i = 0; i<this.cities.length; i++) {
 		city = this.cities[i];
@@ -248,20 +272,7 @@ function refreshCityTable(cities_status) {
 		
 		//Last update
 		var status = getStatusByCityId(cities_status, city.city_id);
-		
-		var last_rendering_finished = 0;
-		if (status != null) {
-			var max_id = 0;
-			for (var j = 0; j < status.renderings.length; j++) {
-				var rendering = status.renderings[j];
-				if (rendering.rendering_id > max_id) {
-					max_id = rendering.rendering_id
-					if (rendering.succesful) {
-						last_rendering_finished = rendering.end;
-					}
-				}
-			}
-		}
+		var last_rendering_finished = getLastRenderingFinishedTime(status);
 
 		 var cell2 = document.createElement("td");
 		 if (last_rendering_finished == 0) {
@@ -300,13 +311,6 @@ function refreshCityTable(cities_status) {
 		 row.appendChild(cell3);
 		 table.appendChild(row);
 	}
-	if (working == true) {
-		setTimeout("loadStatus()",5000); //reload every 5 secs
-	}
-	else {
-		setTimeout("loadStatus()",60000); //reload every minute
-	}
-
 }
  
 function initIndex() {
@@ -344,55 +348,22 @@ function getCityByLatLon(lat,lon) {
 	return null;
 }
 
-function refreshState(repeat) {
-	var city_id = current_city_id; //TODO: not id
-	var city_name = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/@name" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-	if (city_name == "") {
-		document.getElementById("state").data = "Last update: unkown";
-		return;
+function refreshState(cities_status) {
+	var stateDiv = document.getElementById("state");
+	stateDiv.data = "Last update: unkown";
+	
+	var status = getStatusByCityId(cities_status, current_city.city_id);
+	var last_rendering_finished = getLastRenderingFinishedTime(status);
+
+	if (status.status.type == "WORKING") {
+		this.working=true;
+	 	stateDiv.innerHTML = "";
+		stateDiv.appendChild(getWorkingStatusDiv(status));
 	}
-	var stats_last_rendering_finished = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/stats/@last-rendering-finished" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-	var state_date = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@date" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-	var state_type = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@type" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-	var state_message = citiesXml.evaluate("//cities/city[@id='" + city_id + "']/state/@message" , citiesXml, null, XPathResult.STRING_TYPE, null).stringValue;
-	//update state info
-	var div=document.getElementById("state");
-	var working = false;
-	if (state_type == "WORKING") {
-		working=true;
-	 	div.innerHTML = state_message;
-	 	try {
-	 		var date_state = new Date(parseInt(state_date));
-	 		div.innerHTML += '<br/><div class="timestamp">' + getHumanReadableDate(date_state) + "</div>";
-	 	}
-	 	catch (err) {
-		
-	 	}
-	 }
 	 else {
-	 	var lastUpdateStr = "Last update: ";
-	 	if (stats_last_rendering_finished == "") {
-	 		lastUpdateStr += "n/a";
-		}
-		else {
-			try {
-		 		var date = new Date(parseInt(stats_last_rendering_finished));
-		 		lastUpdateStr += getHumanReadableDate(date);
-		 	}
-		 	catch (err) {
-		 		lastUpdateStr += stats_last_rendering_finished;
-		 	}
-		}
-		div.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
-	 }
-	 
-	 if (repeat) {
-	  	if (working) {
-			setTimeout('refreshState(true)',5000); //reload every 5 secs
-		}
-		else {
-			setTimeout('refreshState(true)',60000); //reload every minute
-		}
+		 this.working = false;
+	 	var lastUpdateStr = "Last update: " + getHumanReadableDate(new Date(last_rendering_finished));
+		stateDiv.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
 	 }
 }
 
@@ -471,7 +442,7 @@ function loadCity() {
 					 select.options[i].selected = false;
 				 }
 			 }
-			 refreshState(false);
+			 loadStatus(false);
 		 }
 		 else {
 			 document.title = "3D map";
@@ -550,5 +521,5 @@ function initMap(){
 
 	loadCity();
 	window.onhashchange = loadCity;
-	refreshState(true);
+	loadStatus(true);
 }

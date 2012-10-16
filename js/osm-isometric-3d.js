@@ -144,6 +144,77 @@ function getStatusByCityId(cities_status, id) {
 	return null;
 }
 
+function getWorkingStatusDiv(status) {
+	var div = document.createElement("div");
+	var canvas = document.createElement("canvas");
+	canvas.style.paddingRight = 3;
+	canvas.width = 14;
+	canvas.height = 14;
+	canvas.title = status.status.step + "/" + status.status.total_steps;
+	var context = canvas.getContext("2d");
+	if (window.devicePixelRatio) {
+		var width = canvas.width;
+		var height = canvas.height;
+		canvas.width = canvas.width * window.devicePixelRatio;
+		canvas.height = canvas.height * window.devicePixelRatio;
+		canvas.style.width = width;
+		canvas.style.height = height;
+		context.scale(window.devicePixelRatio, window.devicePixelRatio);
+	}
+	context.fillStyle = "rgb(80,80,80)";
+	context.beginPath();
+	context.moveTo(7,7);
+	var endAngle = 1.0*status.status.step/status.status.total_steps*2.0*Math.PI - 0.5*Math.PI;
+	context.arc(7, 7, 6, -0.5*Math.PI, endAngle, false);
+	context.fill();
+	context.strokeStyle = "rgb(150,150,150)";
+	context.beginPath();
+	context.arc(7, 7, 6, 0.0, 2.0*Math.PI, false);
+	context.stroke();
+	
+	div.appendChild(canvas);
+	
+	div.appendChild(document.createTextNode(status.status.description));
+	div.appendChild(document.createElement("br"));
+	
+	var date_state_hr = "";
+	try {
+		date_state_hr = getHumanReadableDate(new Date(status.status.time));
+	}
+	catch (err) {
+		date_state_hr = "n/a";
+	}
+	var timestamp = document.createElement("div");
+	timestamp.className = "timestamp";
+	timestamp.innerHTML = date_state_hr;
+	
+	div.appendChild(timestamp);
+	
+	return div;
+}
+
+
+function getFailedStatusDiv(status) {
+	var div = document.createElement("div");
+	div.appendChild(document.createTextNode(status.status.description));
+	div.appendChild(document.createElement("br"));
+	
+	var date_state_hr = "";
+	try {
+		date_state_hr = getHumanReadableDate(new Date(status.status.time));
+	}
+	catch (err) {
+		date_state_hr = "n/a";
+	}
+	var timestamp = document.createElement("div");
+	timestamp.className = "timestamp";
+	timestamp.innerHTML = date_state_hr;
+	
+	div.appendChild(timestamp);
+	
+	return div;
+}
+
 
 /*-----------------------------------------*/
 /* for index.html                          */
@@ -208,7 +279,6 @@ function refreshCityTable(cities_status) {
 		
 		//Status
 		 var cell3 = document.createElement("td");
-		//cell3.title="test";
 		if (status != null) {
 			if (status.status.type == "READY") {
 				cell3.innerHTML = "";
@@ -216,47 +286,11 @@ function refreshCityTable(cities_status) {
 			else {
 				if (status.status.type =="WORKING") {
 					working=true;
+					cell3.appendChild(getWorkingStatusDiv(status));
 				}
-				var canvas = document.createElement("canvas");
-				canvas.style.paddingRight = 3;
-				canvas.width = 14;
-				canvas.height = 14;
-				canvas.title = status.status.step + "/" + status.status.total_steps;
-				var context = canvas.getContext("2d");
-				context.fillStyle = "rgb(80,80,80)";
-				context.beginPath();
-				context.moveTo(7,7);
-				var endAngle = 1.0*status.status.step/status.status.total_steps*2.0*Math.PI - 0.5*Math.PI;
-				context.arc(7, 7, 6, -0.5*Math.PI, endAngle, false);
-				context.fill();
-				context.strokeStyle = "rgb(150,150,150)";
-				context.beginPath();
-				context.arc(7, 7, 6, 0.0, 2.0*Math.PI, false);
-				context.stroke();
-
-				cell3.appendChild(canvas);
-				
-				cell3.appendChild(document.createTextNode(status.status.description));
-				cell3.appendChild(document.createElement("br"));
-								  
-				var date_state_hr = "n/a";
-				try {
-					var date_state = new Date(parseInt(status.status.time));
-					try {
-						date_state_hr = getHumanReadableDate(date_state);
-					}
-					catch (err) {
-						date_state_hr = last_rendering_finished;
-					}
+				else {
+					cell3.appendChild(getFailedStatusDiv(status));
 				}
-				catch (err) {
-					
-				}
-				var timestamp = document.createElement("div");
-				timestamp.className = "timestamp";
-				timestamp.innerHTML = date_state_hr;
-
-				cell3.appendChild(timestamp);
 			}
 		}
 

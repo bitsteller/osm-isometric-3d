@@ -454,20 +454,20 @@ def generate_feed():
 			if rendering["succesful"]:
 				item = PyRSS2Gen.RSSItem(
 										 title = "Finished isometric 3D rendering of " + getCityById(cities["cities"],city["city_id"])["name"],
-										 link = "http://bitsteller.bplaced.net/osm/map.html#" + city["city_id"],
+										 link = config["website"] + "/map.html#" + city["city_id"],
 										 description = "",
-										 guid = PyRSS2Gen.Guid("http://bitsteller.bplaced.net/osm/map.html#" + city["city_id"] + "-" + str(rendering["rendering_id"])),
-										 pubDate = datetime.now()) #datetime.fromtimestamp(rendering["end"]/1000.0)
+										 guid = PyRSS2Gen.Guid(config["website"] + "/osm/map.html#" + city["city_id"] + "-" + str(rendering["rendering_id"]),False),
+										 pubDate = datetime.fromtimestamp(rendering["end"]/1000.0))
 				items.append(item)
 	rss = PyRSS2Gen.RSS2(
-					 title = "Finished isometric 3D renderings on http://bitsteller.bplaced.net/osm",
-					 link = "http://bitsteller.bplaced.net/osm/index.html",
-					 description = "This feed notifies you about every finished isometric 3D rendering available on http:/bitsteller.bplaced.net/osm",
+					 title = "Isometric 3D renderings on " + config["website"],
+					 link = config["website"] + "/index.html",
+					 description = "This feed notifies you about every finished isometric 3D rendering available on " + config["website"],
 					 lastBuildDate = datetime.now(),
 					 items=items)
 
 	rss.write_xml(open("finishedRenderings.rss", "w"))
-	execute_cmd("Moving finishedRenderings.rss", "cp status.json output/finishedRenderings.rss")
+	execute_cmd("Moving finishedRenderings.rss", "cp finishedRenderings.rss output/finishedRenderings.rss")
 	upload_file("finishedRenderings.rss")
 
 #main update method

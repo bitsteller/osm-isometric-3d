@@ -8,6 +8,7 @@ import keyring
 import shutil
 import math
 import Image
+import PyRSS2Gen
 
 #==USER OPTIONS==================
 
@@ -444,7 +445,31 @@ def tweet_finished(id):
 	city = [city for city in cities["cities"] if city["city_id"] == id][0]
 	if OPTION_ENABLE_TWITTER:
 		execute_cmd("Updating twitter status", COMMAND_TWIDGE + ' update "' + "Updated isometric 3D map of " + city["name"] + ' http://bitsteller.bplaced.net/osm' + ' #OpenStreetMap"', True)
-								
+
+def generate_feed():
+	print("Generating RSS feed...")
+	items = []
+	for city in status["cities"]:
+		for rendering in city["renderings"]:
+			if rendering["succesful"]:
+				item = PyRSS2Gen.RSSItem(
+										 title = "Finished isometric 3D rendering of " + getCityById(cities["cities"],city["city_id"])["name"],
+										 link = "http://bitsteller.bplaced.net/osm/map.html#" + city["city_id"],
+										 description = "",
+										 guid = PyRSS2Gen.Guid("http://bitsteller.bplaced.net/osm/map.html#" + city["city_id"] + "-" + str(rendering["rendering_id"])),
+										 pubDate = datetime.now()) #datetime.fromtimestamp(rendering["end"]/1000.0)
+				items.append(item)
+	rss = PyRSS2Gen.RSS2(
+					 title = "Finished isometric 3D renderings on http://bitsteller.bplaced.net/osm",
+					 link = "http://bitsteller.bplaced.net/osm/index.html",
+					 description = "This feed notifies you about every finished isometric 3D rendering available on http:/bitsteller.bplaced.net/osm",
+					 lastBuildDate = datetime.now(),
+					 items=items)
+
+	rss.write_xml(open("finishedRenderings.rss", "w"))
+	execute_cmd("Moving finishedRenderings.rss", "cp status.json output/finishedRenderings.rss")
+	upload_file("finishedRenderings.rss")
+
 #main update method
 def update_city(id):
 	status_start(id)
@@ -453,6 +478,7 @@ def update_city(id):
 	generate_tiles(id)
 	upload_tiles(id)
 	tweet_finished(id)
+	generate_feed()
 								
 def getNumberOfTiles(top,left,bottom,right):
 	#compute tile numbers to render

@@ -151,6 +151,34 @@ function getStatusByCityId(cities_status, id) {
 	return null;
 }
 
+function getRecentFinishedRenderings(status) {
+	var succesfulRenderings = [];
+	
+	if (status != null) {
+		for (var i = 0; i < status.renderings.length; i++) {
+			var rendering = status.renderings[i];
+			if (rendering.succesful) {
+				succesfulRenderings.push (rendering);
+			}
+		}
+	}
+	
+	if (succesfulRenderings.length >= 5) {
+		succesfulRenderings = succesfulRenderings.slice (succesfulRenderings.length-6);
+	}
+	return succesfulRenderings;
+}
+
+function getAveragePhaseDuration(status, phase) {
+	var succesfulRenderings = getRecentFinishedRenderings(status);
+	var average = 0;
+	for (var i = 0; i < succesfulRenderings.length; i++) {
+		average += succesfulRenderings[i].durations[phase-1];
+	}
+	average = average / succesfulRenderings.length;
+	return average;
+}
+
 function getWorkingStatusDiv(status) {
 	var div = document.createElement("div");
 	var canvas = document.createElement("canvas");
@@ -184,17 +212,31 @@ function getWorkingStatusDiv(status) {
 	div.appendChild(document.createTextNode(status.status.description));
 	div.appendChild(document.createElement("br"));
 	
-	var date_state_hr = "";
-	try {
-		date_state_hr = getHumanReadableDate(new Date(status.status.time));
-	}
-	catch (err) {
-		date_state_hr = "n/a";
-	}
 	var timestamp = document.createElement("div");
 	timestamp.className = "timestamp";
-	timestamp.innerHTML = date_state_hr;
-	
+	if (getRecentFinishedRenderings(status).length >= 3) {
+		var timeLeft = getAveragePhaseDuration(status, status.status.phase)*status.status.step/status.status.total_steps
+		for (var i = status.status.phase; i <= status.status.total_phases; i++) {
+			timeLeft += getAveragePhaseDuration(status, i);
+		}
+		timestamp.title = parseInt(timeLeft/1000/60) + " minutes left"
+
+		var dateFinished = new Date(new Date().getTime() + timeLeft);
+		timestamp.innerHTML= "New rendering available at " + dateFinished.getHours() + ":";
+		timestamp.innerHTML+= (dateFinished.getMinutes() < 10 ? "0" + dateFinished.getMinutes(): dateFinished.getMinutes());
+	}
+	else {
+		var date_state_hr = "";
+		try {
+			date_state_hr = getHumanReadableDate(new Date(status.status.time));
+		}
+		catch (err) {
+			date_state_hr = "n/a";
+		}
+
+		timestamp.innerHTML = date_state_hr;
+
+	}
 	div.appendChild(timestamp);
 	
 	return div;

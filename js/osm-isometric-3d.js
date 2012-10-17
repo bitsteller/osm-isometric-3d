@@ -7,6 +7,7 @@ var map = null;
 var current_city = null;
 var marker = null;
 var working = false;
+var cached_cities_status = {};
 
 var Modes = {
 	INDEX: 0,
@@ -185,7 +186,7 @@ function getWorkingStatusDiv(status) {
 	canvas.style.paddingRight = 3;
 	canvas.width = 14;
 	canvas.height = 14;
-	canvas.title = status.status.step + "/" + status.status.total_steps;
+	canvas.title = "Step " + status.status.step + "/" + status.status.total_steps;
 	var context = canvas.getContext("2d");
 	if (window.devicePixelRatio) {
 		var width = canvas.width;
@@ -215,8 +216,8 @@ function getWorkingStatusDiv(status) {
 	var timestamp = document.createElement("div");
 	timestamp.className = "timestamp";
 	if (getRecentFinishedRenderings(status).length >= 3) {
-		var timeLeft = getAveragePhaseDuration(status, status.status.phase)*status.status.step/status.status.total_steps
-		for (var i = status.status.phase; i <= status.status.total_phases; i++) {
+		var timeLeft = getAveragePhaseDuration(status, status.status.phase)*(status.status.total_steps-status.status.step)/status.status.total_steps
+		for (var i = status.status.phase + 1; i <= status.status.total_phases; i++) {
 			timeLeft += getAveragePhaseDuration(status, i);
 		}
 		timestamp.title = parseInt(timeLeft/1000/60) + " minutes left"
@@ -238,7 +239,7 @@ function getWorkingStatusDiv(status) {
 
 	}
 	div.appendChild(timestamp);
-	
+	div.title ="Phase " + status.status.phase + "/" + status.status.total_phases;
 	return div;
 }
 
@@ -288,6 +289,7 @@ function getLastRenderingFinishedTime(status) {
 /*-----------------------------------------*/
 
 function refreshCityTable(cities_status) {
+	this.cached_cities_status = cities_status;
   	//clear table
  	var table = document.getElementById("city_list").getElementsByTagName("tbody")[0];
 	while (table.firstElementChild) {
@@ -352,6 +354,10 @@ function refreshCityTable(cities_status) {
  
 function initIndex() {
 	mode = Modes.INDEX;
+	
+	var table = document.getElementById("city_list").getElementsByTagName("tbody")[0];
+	table.innerHTML = '<tr><td><img src="img/loading.gif"/> Loading...</td><td></td><td></td></tr>';
+
 	loadCities();
 	loadStatus();
 }
@@ -385,7 +391,28 @@ function getCityByLatLon(lat,lon) {
 	return null;
 }
 
+function showStats() {
+	var status = getStatusByCityId(this.cached_cities_status, current_city.city_id);
+	var message = "";
+	message += "<ul>"
+	message += "<li>Number of tiles (zoom=12): " + status.stats.tiles + "</li>";
+	message += "<li>Number of tiles (total): " + status.stats.total_tiles + "</li>";
+	message += "<li>Average phase durations: ";
+	var sumDurations = 0;
+	for (var i = 1; i <= 5; i++) {
+		sumDurations += getAveragePhaseDuration(status, i);
+		message += parseInt(getAveragePhaseDuration(status, i)/1000) + "s ";
+	}
+	message += "</li>";
+	message += "<li>Average update duration: " + parseInt(sumDurations/1000/60) + "min";
+	message += "<li>Last rendering finished: " + (new Date(getLastRenderingFinishedTime(status))).toUTCString() + "</li>";
+	message += "</ul>";
+	message += '<a href="javascript:hideMessage()">Close</a>';
+	showMessage("Statistics for " + current_city.name, message);
+}
+
 function refreshState(cities_status) {
+	this.cached_cities_status = cities_status;
 	var stateDiv = document.getElementById("state");
 	stateDiv.data = "Last update: unkown";
 	

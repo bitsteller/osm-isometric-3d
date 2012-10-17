@@ -195,6 +195,12 @@ table {
 	margin-bottom: 0.333em;
 }
 
+.feed {
+  margin-left: 3px;
+  padding: 0 0 0 19px;
+  background: url("img/feed-icon-14x14.png") no-repeat 0 50%;
+}
+
 #page{
 	max-width:800px;
 	clear: both; 

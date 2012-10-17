@@ -466,9 +466,9 @@ def generate_feed():
 					 lastBuildDate = datetime.now(),
 					 items=items)
 
-	rss.write_xml(open("finishedRenderings.rss", "w"))
-	execute_cmd("Moving finishedRenderings.rss", "cp finishedRenderings.rss output/finishedRenderings.rss")
-	upload_file("finishedRenderings.rss")
+	rss.write_xml(open("finishedRenderings.xml", "w"))
+	execute_cmd("Moving finishedRenderings.xml", "cp finishedRenderings.xml output/finishedRenderings.xml")
+	upload_file("finishedRenderings.xml")
 
 #main update method
 def update_city(id):

@@ -16,4 +16,4 @@ cities.json
 status.json
 .DS_Store
 *.swp
-finishedRenderings.rss
+finishedRenderings.xml

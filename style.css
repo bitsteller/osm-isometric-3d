@@ -230,7 +230,7 @@ table {
 
 #info{
 	width:auto;
-	min-height:50px;
+	min-height:36px;
 	height:5%;
 	padding-left:10px;
 	padding-right:10px;
@@ -289,7 +289,7 @@ table {
 
 #footer{
 	margin-top:10px;
-	min-height:60px;
+	min-height:30px;
 }
 
 #github-commits-osm2pov ul {
@@ -407,4 +407,31 @@ table {
 	-moz-animation-name: fadeIn;
 	-o-animation-name: fadeIn;
 	animation-name: fadeIn;
+}
+
+@-webkit-keyframes fadeOut {
+	0% {opacity: .7;}
+	100% {opacity: 0;}
+}
+
+@-moz-keyframes fadeOut {
+	0% {opacity: .7;}
+	100% {opacity: 0;}
+}
+
+@-o-keyframes fadeOut {
+	0% {opacity: .7;}
+	100% {opacity: 0;}
+}
+
+@keyframes fadeOut {
+	0% {opacity: .7;}
+	100% {opacity: 0;}
+}
+
+.fadeOut {
+	-webkit-animation-name: fadeOut;
+	-moz-animation-name: fadeOut;
+	-o-animation-name: fadeOut;
+	animation-name: fadeOut;
 }

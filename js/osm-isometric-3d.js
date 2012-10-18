@@ -112,9 +112,10 @@ function getHumanReadableDate(date) {
 
 function showMessage(title, innerHTML) {
 	hideMessage();
-   var overlay = document.createElement("div");
-   overlay.setAttribute("id","overlay");
-   overlay.setAttribute("class", "overlay");
+    var overlay = document.createElement("div");
+    overlay.setAttribute("id","overlay");
+    overlay.setAttribute("class", "overlay");
+	overlay.setAttribute("onClick", "hideMessage()");
    
    var error = document.createElement("div");
    error.setAttribute("id","message");
@@ -135,7 +136,30 @@ function hideMessage() {
 	}
 	try {
 		var overlay = document.getElementById("overlay");
-		document.body.removeChild(overlay);
+		if (overlay.style.animationName !== undefined) {
+			overlay.addEventListener('animationEnd', function(){
+									 document.body.removeChild(overlay);
+									 }, false);
+			overlay.style.animationName = "fadeOut";
+		}
+		else if (overlay.style.webkitAnimationName !== undefined) {
+			overlay.addEventListener('webkitAnimationEnd', function(){
+									 document.body.removeChild(overlay);
+									 }, false);
+			overlay.style.webkitAnimationName = "fadeOut";
+		}
+		else if (overlay.style.mozAnimationName !== undefined) {
+			overlay.addEventListener('mozAnimationEnd', function(){
+									 document.body.removeChild(overlay);
+									 }, false);
+			overlay.style.mozAnimationName = "fadeOut";
+		}
+		else if (overlay.style.oAnimationName !== undefined) {
+			overlay.addEventListener('oAnimationEnd', function(){
+									 document.body.removeChild(overlay);
+									 }, false);
+			overlay.style.oAnimationName = "fadeOut";
+		}
 	}
 	catch (err) {
 	

@@ -455,15 +455,15 @@ def generate_feed():
 				item = PyRSS2Gen.RSSItem(
 										 title = "Finished isometric 3D rendering of " + getCityById(cities["cities"],city["city_id"])["name"],
 										 link = config["website"] + "/map.html#" + city["city_id"],
-										 description = "",
-										 guid = PyRSS2Gen.Guid(config["website"] + "/osm/map.html#" + city["city_id"] + "-" + str(rendering["rendering_id"]),False),
-										 pubDate = datetime.fromtimestamp(rendering["end"]/1000.0))
+										 description = "Rendering took " + str(int(sum(rendering["durations"])/1000/60)) + " minutes.",
+										 guid = PyRSS2Gen.Guid(config["website"] + "/map.html#" + city["city_id"] + "-" + str(rendering["rendering_id"]),False),
+										 pubDate = datetime.utcfromtimestamp(rendering["end"]/1000.0))
 				items.append(item)
 	rss = PyRSS2Gen.RSS2(
 					 title = "Isometric 3D renderings on " + config["website"],
 					 link = config["website"] + "/index.html",
 					 description = "This feed notifies you about every finished isometric 3D rendering available on " + config["website"],
-					 lastBuildDate = datetime.now(),
+					 lastBuildDate = datetime.utcnow(),
 					 items=items)
 
 	rss.write_xml(open("finishedRenderings.xml", "w"))
@@ -472,6 +472,7 @@ def generate_feed():
 
 #main update method
 def update_city(id):
+	generate_feed()
 	status_start(id)
 	download_city(id)
 	render_tiles(id)

@@ -302,17 +302,20 @@ function refreshCityTable(cities_status) {
 		 var row = document.createElement("tr");
 		//Thumbnail
 		 var cell0 = document.createElement("td");
+		 var link = document.createElement("a");
+		 link.setAttribute("href", "map.html#" + city.city_id);
 		 var image = document.createElement("img");
 		 image.setAttribute("src", "tiles/14/" + Math.round(long2tile((city.area.left + city.area.right)/2.0,14)) + "/" + Math.round(lat2tile((city.area.top + city.area.bottom)/2.0,14)/2.0) + ".png");
 		 image.setAttribute("class", "thumbnail");
-		 cell0.appendChild(image);
+		 link.appendChild(image);
+		 cell0.appendChild(link);
 		
 		//Name and link
 		 var cell1 = document.createElement("td");
-		 var link = document.createElement("a");
-		 link.setAttribute("href", "map.html#" + city.city_id);
-		 link.innerHTML = city.name;
-		 cell1.appendChild(link);
+		 var link1 = document.createElement("a");
+		 link1.setAttribute("href", "map.html#" + city.city_id);
+		 link1.innerHTML = city.name;
+		 cell1.appendChild(link1);
 		
 		//Last update
 		var status = getStatusByCityId(cities_status, city.city_id);

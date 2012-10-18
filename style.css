@@ -230,6 +230,7 @@ table {
 
 #info{
 	width:auto;
+	min-height:50px;
 	height:5%;
 	padding-left:10px;
 	padding-right:10px;
@@ -288,6 +289,7 @@ table {
 
 #footer{
 	margin-top:10px;
+	min-height:60px;
 }
 
 #github-commits-osm2pov ul {

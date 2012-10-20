@@ -441,26 +441,28 @@ function showStats() {
 function refreshState(cities_status) {
 	this.cached_cities_status = cities_status;
 	var stateDiv = document.getElementById("state");
-	stateDiv.data = "Last update: unkown";
+	stateDiv.innerHTML = '<div class="timestamp">' + "Last update: unkown" + "</div>";
 	
 	var status = getStatusByCityId(cities_status, current_city.city_id);
-	var last_rendering_finished = getLastRenderingFinishedTime(status);
-
-	if (status.status.type == "WORKING") {
-		this.working=true;
-	 	stateDiv.innerHTML = "";
-		stateDiv.appendChild(getWorkingStatusDiv(status));
+	if (status != null) {
+		var last_rendering_finished = getLastRenderingFinishedTime(status);
+		
+		if (status.status.type == "WORKING") {
+			this.working=true;
+			stateDiv.innerHTML = "";
+			stateDiv.appendChild(getWorkingStatusDiv(status));
+		}
+		else {
+			this.working = false;
+			if (last_rendering_finished == 0) {
+				stateDiv.innerHTML = '<div class="timestamp">' + "Last update: n/a" + "</div>";
+			}
+			else {
+				var lastUpdateStr = "Last update: " + getHumanReadableDate(new Date(last_rendering_finished));
+				stateDiv.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
+			}
+		}
 	}
-	 else {
-		 this.working = false;		 
-		 if (last_rendering_finished == 0) {
-			 stateDiv.innerHTML = "Last update: n/a";
-		 }
-		 else {
-			 var lastUpdateStr = "Last update: " + getHumanReadableDate(new Date(last_rendering_finished));
-			 stateDiv.innerHTML = '<div class="timestamp">' + lastUpdateStr + "</div>";
-		 }
-	 }
 }
 
 function loadPermalink() {

@@ -26,7 +26,7 @@ DIR_OSM2POV = "osm2pov"
 
 
 application_name = "osm2pov-make"
-version_number = "0.3.1"
+version_number = "0.4.0"
 
 current_phase = 0
 total_phases = 5
@@ -263,7 +263,7 @@ def status_progress(id, description, phase, step, total_steps):
 
 def status_failed(id, description):
 	city = getCityById(status["cities"], id)
-	city.status = { "time": int(time.time()*1000),
+	city["status"] = { "time": int(time.time()*1000),
 					"type": "FAILED",
 					"description": description }
 	upload_status()
@@ -546,10 +546,10 @@ def help():
 	print("Available commands:")
 	print(" " + name + " " + "version" + " - " + "output version number")
 	print(" " + name + " " + "help" + " - " + "this help")
-	print(" " + name + " " + "post <city> <state> <msg>" + " - " + "post message to website")
+	print(" " + name + " " + "post <city> <msg>" + " - " + "post message to website")
 	print(" " + name + " " + "update <city>" + " - " + "render and upload city")
-	print(" " + name + " " + "render <city>" + " - " + "render city")
-	print(" " + name + " " + "upload <city>" + " - " + "upload city")
+	#	print(" " + name + " " + "render <city>" + " - " + "render city")
+	#	print(" " + name + " " + "upload <city>" + " - " + "upload city")
 	print(" " + name + " " + "password" + " - " + "reset pasword stored in keychain")
 	print(" " + name + " " + "expand" + " - " + "compute city bounds that minimize the unused border")	
 
@@ -570,14 +570,14 @@ if len(sys.argv)>1:
 			status_failed(city_id, sys.argv[3])
 		elif action=="update" and len(sys.argv)==3:
 			update_city(city_id)
-		elif action=="render" and len(sys.argv)==3:
-			download_city(city_id)			
-			render_tiles(city_id)
-			generate_tiles(city_id)
-		elif action=="upload" and len(sys.argv)==3:
-			upload_tiles(city_id)
-		elif action=="download" and len(sys.argv)==3:
-			download_city(city_id)
+#		elif action=="render" and len(sys.argv)==3:
+#			download_city(city_id)			
+#			render_tiles(city_id)
+#			generate_tiles(city_id)
+#		elif action=="upload" and len(sys.argv)==3:
+#			upload_tiles(city_id)
+#		elif action=="download" and len(sys.argv)==3:
+#			download_city(city_id)
 		elif action=="expand" and len(sys.argv)==3:
 			expand_city(city_id)
 		else:

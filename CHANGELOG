@@ -1,4 +1,19 @@
-Version 0.3.1
+Version 0.4.0 (2012-10-20)
+	* website: add link to RSS feed for finished renderings
+	* website: add simple statistics for cities in map view
+	* website: improved display of rendering status (finishing time, progress indicator…)
+	* website: fetching of rendering status non-blocking (ajax-like)
+	* website: improvements to animations
+	* website: fix caching of rendering status
+	* website: clicking on the thumbnail image now also opens the map
+	* website: various small improvements
+	* script: cities.xml is replaced by cities.json, config.json (input) and status.json (output)
+	* script: added converting script for migration from 0.3.1 to 0.4.0
+	* script: upload status every 30secs at most
+	* script: expand command can now save the suggested coordinates
+	* script: regression: upload and render commands are not available in this version
+
+Version 0.3.1 (2012-10-12)
 	* website: switched map library from khtml to leaflet
 	* website: geolocation support
 	* website: improved permalink support

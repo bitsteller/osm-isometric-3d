@@ -1,0 +1,9 @@
+{
+	"version": 1,
+	"website": "http://bitsteller.bplaced.net/osm",
+	"ftp": {
+		"url": "bitsteller.bplaced.net",
+		"user": "bitsteller",
+		"path": "osm"
+	}
+}

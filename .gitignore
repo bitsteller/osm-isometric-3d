@@ -8,9 +8,8 @@ twidge
 *.pbf
 *.osm
 osm2pov-styles.inc
-*.png
+/*.png
 *.pov
-cities.xml
 config.json
 cities.json
 status.json

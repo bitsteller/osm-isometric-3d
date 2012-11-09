@@ -9,6 +9,7 @@ Version 0.4.0 (2012-10-20)
 	* website: various small improvements
 	* script: cities.xml is replaced by cities.json, config.json (input) and status.json (output)
 	* script: added converting script for migration from 0.3.1 to 0.4.0
+	* script: generate and upload RSS feed for finished renderings
 	* script: upload status every 30secs at most
 	* script: expand command can now save the suggested coordinates
 	* script: regression: upload and render commands are not available in this version

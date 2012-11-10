@@ -533,7 +533,7 @@ function loadCity() {
 			 document.title = "3D map of " + city.name;
 			 var select=document.getElementById("city_select");
 			 for (var i = 0; i < select.length; i++) {
-				 if (select.options[i].value == city_id) {
+				 if (select.options[i].value == city.city_id) {
 					 select.options[i].selected = true;
 				 }
 				 else {

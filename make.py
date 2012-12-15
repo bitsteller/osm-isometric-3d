@@ -25,8 +25,8 @@ DIR_OSM2POV = "osm2pov"
 #===CONSTANTS====================
 
 
-application_name = "osm2pov-make"
-version_number = "0.4.0"
+application_name = "osm-isometric-3d/make"
+version_number = "0.4.1"
 
 current_phase = 0
 total_phases = 5

@@ -1,3 +1,10 @@
+Version 0.4.1 (2012-12-15)
+	* website: update leaflet to version 0.4.5
+	* website: fixed wrong city chooser behavior
+	* script: new cleanup command that cleans up unnecessary files and log entries
+	* script: added auto cleanup after update
+	* script: added example files for status.json and config.json
+
 Version 0.4.0 (2012-10-20)
 	* website: add link to RSS feed for finished renderings
 	* website: add simple statistics for cities in map view

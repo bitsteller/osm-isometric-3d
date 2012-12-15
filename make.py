@@ -112,17 +112,18 @@ def upload_file(filename):
 	
 	print ("Uploading file '" + filename + "' finished.")
 
-def file_exists(filename):
+def isFileCached(filename):
 	if os.path.isfile(filename):
 		filestats = os.stat(filename)
 		d = (datetime.now() - timedelta(4)).timetuple() #Keep file if not older than 5 days
 		if time.localtime(filestats[stat.ST_MTIME]) > d:
 			return True
 		else:
+			print("Removing " + filename + "...")
 			os.remove(filename)
 			return False
 	else:
-		return False
+		return False	
 
 def execute_cmd(action, cmd, ignore_error=False):
 	sys.stdout.write(action + "...")
@@ -190,7 +191,7 @@ def upload_status():
 	upload_file("status.json")
 	last_status_time = int(time.time()*1000)
 
-def init_status(id):
+def init_status(id=""):
 	global status
 	#upload cities.json
 	execute_cmd("Moving cities.json", "cp cities.json output/cities.json")
@@ -204,16 +205,17 @@ def init_status(id):
 	else:
 		status = {"version": 1, "cities": []}
 	
-	city = getCityById(status["cities"], id)
+	if id != "":
+		city = getCityById(status["cities"], id)
 	
-	if city == None:
-		city = {"city_id": id, "stats": dict(), "status": {"type": "READY"}, "renderings": []}
-		status["cities"].append(city)
+		if city == None:
+			city = {"city_id": id, "stats": dict(), "status": {"type": "READY"}, "renderings": []}
+			status["cities"].append(city)
 	
-	mintile_x, maxtile_x, mintile_y, maxtile_y = getMinMaxTiles(id)
-	numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1))
-	city["stats"]["tiles"] = numberoftiles
-	city["stats"]["total_tiles"] = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
+		mintile_x, maxtile_x, mintile_y, maxtile_y = getMinMaxTiles(id)
+		numberoftiles = ((maxtile_x - mintile_x + 1) * (maxtile_y - mintile_y + 1))
+		city["stats"]["tiles"] = numberoftiles
+		city["stats"]["total_tiles"] = numberoftiles * (1*1 + 2*2 + 4*4 + 8*8) #zoom from 12 to 15
 
 def status_start(id):
 	global rendering
@@ -269,8 +271,6 @@ def status_failed(id, description):
 	upload_status()
 
 def status_cleanup():
-	print("Cleaning up...")
-	#cleanup old renderings etc. from status.json
 	for city in status["cities"]:
 		if getCityById(cities["cities"], city["city_id"]) == None:
 			print("Removing " + city["city_id"] + " from status.json...")
@@ -284,16 +284,13 @@ def status_cleanup():
 						city["renderings"].pop(i)
 	upload_status()
 
-
-
-
 #==PROGRAM FUNCTIONS=================
 
 # Download a osm file
 def download_osm(source):
 	filename = source.split("/")[-1]
 	
-	if file_exists(filename) == False:
+	if isFileCached(filename) == False:
 		execute_cmd("Downloading '" + source + "'", COMMAND_CURL + " " + source)
 
 def download_city(id):
@@ -303,7 +300,7 @@ def download_city(id):
 	download_osm(city["source"]) #Download .pbf
 
 	status_progress(id, "Downloading", 1, 2, 2)
-	filename = source.split("/")[-1]
+	filename = city["source"].split("/")[-1]
 	trim_osm(filename, id, city["area"]["top"], city["area"]["left"], city["area"]["bottom"], city["area"]["right"]) #Trim and convert to .osm
 	status_end_phase(id, 1)
 
@@ -312,7 +309,7 @@ def download_city(id):
 def trim_osm(sourcefile, id, top, left, bottom, right):
 	filename = id + ".osm"
 	
-	if file_exists(filename) == False:
+	if isFileCached(filename) == False:
 		command  = COMMAND_OSMOSIS + ' '
 		command += '--read-bin file="' + sourcefile + '" '
 		command += '--bounding-box top=' + str(top) + ' left=' + str(left) + ' bottom=' + str(bottom) + ' right=' + str(right) + ' '
@@ -483,6 +480,23 @@ def generate_feed():
 	execute_cmd("Moving finishedRenderings.xml", "cp finishedRenderings.xml output/finishedRenderings.xml")
 	upload_file("finishedRenderings.xml")
 
+def cleanup():
+	print("Cleaning up...")
+	#cleanup old renderings etc. from status.json
+	status_cleanup()
+	
+	#cleanup unneccesary files
+	for city in cities["cities"]:
+		filename = city["source"].split("/")[-1]
+		isFileCached(filename) #deletes if older than 4 days
+		isFileCached(city["city_id"] + ".osm") #deletes if older than 4 days
+		isFileCached(city["city_id"] + ".pov") #deletes if older than 4 days
+	if os.path.exists("temp"):
+		print("Cleaning 'temp' folder...")
+		shutil.rmtree("temp")
+	print("Cleanup complete.")
+
+
 #main update method
 def update_city(id):
 	generate_feed()
@@ -493,6 +507,7 @@ def update_city(id):
 	upload_tiles(id)
 	tweet_finished(id)
 	generate_feed()
+	cleanup()
 								
 def getNumberOfTiles(top,left,bottom,right):
 	#compute tile numbers to render
@@ -576,6 +591,9 @@ if len(sys.argv)>1:
 		help()
 	elif action=="password":
 		prepare_ftp(True) #change password
+	elif action=="cleanup":
+		init_status()
+		cleanup()
 	elif len(sys.argv)>2:
 		city_id = sys.argv[2]
 		init_status(city_id)
@@ -595,7 +613,6 @@ if len(sys.argv)>1:
 			expand_city(city_id)
 		else:
 			print("FAILED: Wrong number of arguments for action or unkown action")
-		status_cleanup()
 	else:
 		print("FAILED: Wrong number of arguments for action or unkown action")
 else:

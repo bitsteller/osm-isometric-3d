@@ -574,6 +574,7 @@ def help():
 	print("Available commands:")
 	print(" " + name + " " + "version" + " - " + "output version number")
 	print(" " + name + " " + "help" + " - " + "this help")
+	print(" " + name + " " + "cleanup" + " - " + "cleanup unnecessary data")
 	print(" " + name + " " + "post <city> <msg>" + " - " + "post message to website")
 	print(" " + name + " " + "update <city>" + " - " + "render and upload city")
 	#	print(" " + name + " " + "render <city>" + " - " + "render city")

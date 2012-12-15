@@ -269,8 +269,22 @@ def status_failed(id, description):
 	upload_status()
 
 def status_cleanup():
-	print("cleanup") #TODO: cleanup old renderings etc. from status.json
+	print("Cleaning up...")
+	#cleanup old renderings etc. from status.json
+	for city in status["cities"]:
+		if getCityById(cities["cities"], city["city_id"]) == None:
+			print("Removing " + city["city_id"] + " from status.json...")
+			status["cities"].remove(city)
+		else:
+			while len([rendering for rendering in city["renderings"] if rendering["succesful"] == True]) > 10:
+				oldestRenderingId = min([rendering["rendering_id"] for rendering in city["renderings"]])
+				print("Removing rendering log entry " + city["city_id"] + "/" + str(oldestRenderingId) + " from status.json...")
+				for i in range(0,len(city["renderings"])-1):
+					if city["renderings"][i]["rendering_id"] == oldestRenderingId:
+						city["renderings"].pop(i)
 	upload_status()
+
+
 
 
 #==PROGRAM FUNCTIONS=================
@@ -286,8 +300,7 @@ def download_city(id):
 	city = [city for city in cities["cities"] if city["city_id"] == id][0]
 	
 	status_progress(id, "Downloading", 1, 1, 2)
-	source = city["source"]
-	download_osm(source) #Download .pbf
+	download_osm(city["source"]) #Download .pbf
 
 	status_progress(id, "Downloading", 1, 2, 2)
 	filename = source.split("/")[-1]

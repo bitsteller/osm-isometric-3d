@@ -553,10 +553,10 @@ def expand_city(id):
 	print(' top="' + str(top) + '" left="' + str(left) + '" bottom="' + str(bottom) + '" right="' + str(right) + '"')
 
 	if confirm("Do you want to overwrite the old bounds with the suggested ones?", default=False):
-		city["area"]["top"] = str(top)
-		city["area"]["left"] = str(left)
-		city["area"]["bottom"] = str(bottom)
-		city["area"]["right"] = str(right)
+		city["area"]["top"] = top
+		city["area"]["left"] = left
+		city["area"]["bottom"] = bottom
+		city["area"]["right"] = right
 
 		s = json.dumps(cities, indent=3)
 				
